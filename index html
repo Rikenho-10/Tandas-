@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TandaManager Pro | Control Compartido</title>
+    <!-- Tailwind CSS para un diseño premium oscuro -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+
+    <!-- HEADER / NAVEGACIÓN -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">TandaManager Pro</h1>
+                    <div class="flex items-center gap-2">
+                        <p class="text-xs text-indigo-400 font-medium tracking-wider uppercase">Ventas Compartidas</p>
+                        <!-- Indicador de conexión en la nube -->
+                        <span id="sync-indicator" class="inline-flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-semibold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            Conectando nube...
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 bg-indigo-600 text-white">
+                    Tablero
+                </button>
+                <button onclick="switchTab('tandas')" id="nav-tandas" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-slate-200">
+                    Tandas
+                </button>
+                <button onclick="switchTab('inventario')" id="nav-inventario" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-slate-200">
+                    Productos
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- NOTIFICACIONES TEMPORALES -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ================= TABLERO (DASHBOARD) ================= -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- Tarjetas de Métricas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-emerald-500/10">
+                        <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <p class="text-sm text-slate-400 font-medium">Total Ventas (Tandas)</p>
+                    <p class="text-2xl font-bold mt-1 text-slate-100" id="stat-total-ventas">$0.00</p>
+                    <div class="text-xs text-indigo-400 mt-2 font-semibold">Valor de mercancía colocada</div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-indigo-500/10">
+                        <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <p class="text-sm text-slate-400 font-medium">Total Cobrado</p>
+                    <p class="text-2xl font-bold mt-1 text-emerald-400" id="stat-total-cobrado">$0.00</p>
+                    <div class="text-xs text-emerald-500 mt-2 font-semibold flex items-center gap-1">
+                        <span id="stat-cobrado-porcentaje">0%</span> cobrado en total
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-amber-500/10">
+                        <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <p class="text-sm text-slate-400 font-medium">Pendiente por Cobrar</p>
+                    <p class="text-2xl font-bold mt-1 text-amber-400" id="stat-total-pendiente">$0.00</p>
+                    <div class="text-xs text-amber-500 mt-2 font-semibold">Dinero activo en tandas</div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-violet-500/10">
+                        <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <p class="text-sm text-slate-400 font-medium">Ganancia Estimada</p>
+                    <p class="text-2xl font-bold mt-1 text-violet-400" id="stat-total-ganancia">$0.00</p>
+                    <div class="text-xs text-violet-500 mt-2 font-semibold flex items-center gap-1">
+                        Diferencia de costo/venta
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen y Alertas Rápidas -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Próximos Pagos Pendientes -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 lg:col-span-2">
+                    <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        Cobros sugeridos para hoy
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3 rounded-l-lg">Cliente</th>
+                                    <th class="px-4 py-3">Tanda / N°</th>
+                                    <th class="px-4 py-3">Abono Pendiente</th>
+                                    <th class="px-4 py-3">Total Restante</th>
+                                    <th class="px-4 py-3 rounded-r-lg text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-proximos-pagos" class="divide-y divide-slate-800/50">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-8 text-center text-slate-500">
+                                        Cargando datos compartidos de la nube...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-100 mb-2">Acceso Rápido</h3>
+                        <p class="text-slate-400 text-sm mb-4">Usa estos botones para alimentar el sistema compartido.</p>
+                        
+                        <div class="space-y-3">
+                            <button onclick="openTandaModal()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-medium py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Crear Nueva Tanda
+                            </button>
+                            <button onclick="switchTab('inventario'); openProductModal();" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                Registrar Producto Cerrado
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 border-t border-slate-800 pt-4 text-center">
+                        <span class="text-xs text-indigo-400 font-medium">
+                            💡 Ambos pueden abrir la app simultáneamente. ¡Los cambios se guardan al instante!
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECCIÓN TANDAS ================= -->
+        <section id="tab-tandas" class="space-y-6 hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-100">Control de Tandas Activas</h2>
+                    <p class="text-slate-400 text-sm">Monitorea los números, abonos y progreso de tus clientes.</p>
+                </div>
+                <button onclick="openTandaModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Nueva Tanda
+                </button>
+            </div>
+
+            <!-- Grid de Tandas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tandas-container">
+                <!-- Cartas de tandas creadas dinámicamente -->
+            </div>
+        </section>
+
+        <!-- ================= SECCIÓN INVENTARIO (PRODUCTOS) ================= -->
+        <section id="tab-inventario" class="space-y-6 hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-100">Catálogo de Productos Cerrados</h2>
+                    <p class="text-slate-400 text-sm">Registra y edita la mercancía disponible para tandas.</p>
+                </div>
+                <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Nuevo Producto
+                </button>
+            </div>
+
+            <!-- Tabla de Inventario -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4">Producto</th>
+                                <th class="px-6 py-4">Precio Costo</th>
+                                <th class="px-6 py-4">Precio Venta</th>
+                                <th class="px-6 py-4">Ganancia Directa</th>
+                                <th class="px-6 py-4">Stock Disponible</th>
+                                <th class="px-6 py-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-productos" class="divide-y divide-slate-800/60">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto border-t border-slate-800 bg-slate-900/40 py-4 text-center text-xs text-slate-500">
+        <p>TandaManager Pro &copy; 2026. Diseñado para control privado de ventas.</p>
+    </footer>
+
+    <!-- ================= MODAL: NUEVA / EDITAR TANDA ================= -->
+    <div id="modal-tanda" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 class="font-bold text-slate-100" id="tanda-modal-title">Registrar Nueva Tanda</h3>
+                <button onclick="closeTandaModal()" class="text-slate-400 hover:text-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="form-tanda" class="p-6 space-y-4">
+                <input type="hidden" id="tanda-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Nombre del Cliente</label>
+                    <input type="text" id="tanda-client" required class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Ej. Ricardo">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Teléfono / Contacto</label>
+                        <input type="text" id="tanda-phone" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Opcional">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Número de Sorteo/Turno</label>
+                        <input type="number" id="tanda-number" min="1" max="100" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Ej. 3">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Producto Vendido</label>
+                    <select id="tanda-product" required class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all">
+                        <!-- Cargados dinámicamente -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Monto Total ($)</label>
+                        <input type="number" id="tanda-amount" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Número de Pagos</label>
+                        <input type="number" id="tanda-installments" required min="1" max="52" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all" placeholder="Ej. 10">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Frecuencia de Pago</label>
+                        <select id="tanda-frequency" required class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all">
+                            <option value="Semanal">Semanal</option>
+                            <option value="Quincenal">Quincenal</option>
+                            <option value="Mensual">Mensual</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Fecha de Inicio</label>
+                        <input type="date" id="tanda-date" required class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeTandaModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-sm border border-slate-700 transition-all">Cancelar</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-600/10">Guardar Tanda</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: NUEVO / EDITAR PRODUCTO ================= -->
+    <div id="modal-product" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 class="font-bold text-slate-100" id="product-modal-title">Registrar Producto Cerrado</h3>
+                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="form-product" class="p-6 space-y-4">
+                <input type="hidden" id="product-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Nombre del Producto</label>
+                    <input type="text" id="product-name" required class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Ej. Perfume Cerrado, Reloj, Box Set">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Costo Unitario ($)</label>
+                        <input type="number" id="product-cost" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all" placeholder="Lo que te costó">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Precio de Venta ($)</label>
+                        <input type="number" id="product-price" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all" placeholder="Precio al público">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Cantidad en Inventario (Stock)</label>
+                    <input type="number" id="product-stock" required min="0" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all" placeholder="Unidades disponibles">
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeProductModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-sm border border-slate-700 transition-all">Cancelar</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-600/10">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= CONEXIÓN FIREBASE + LÓGICA ================= -->
+    <script type="module">
+        // Importar Firebase SDKs desde CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Obtener variables de entorno o defaults
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tanda-manager-shared-app';
+        const firebaseConfig = JSON.parse(__firebase_config);
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Estado local en sincronía con la nube
+        let state = {
+            products: [],
+            tandas: []
+        };
+
+        let userAuthenticated = null;
+
+        // --- SISTEMA DE AUTENTICACIÓN (REGLA 3) ---
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Error al autenticar:", error);
+                document.getElementById('sync-indicator').innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    Error de sincronización
+                `;
+            }
+        };
+
+        // Escuchar cambios de Auth
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userAuthenticated = user;
+                // Una vez autenticado, conectar los listeners de tiempo real
+                conectarNube();
+            } else {
+                userAuthenticated = null;
+            }
+        });
+
+        // Ejecutar proceso de autenticación de inmediato
+        initAuth();
+
+        // --- COLECTAR Y SINCRONIZAR DATOS EN TIEMPO REAL (REGLAS 1 Y 2) ---
+        function conectarNube() {
+            if (!userAuthenticated) return;
+
+            // Ruta estricta de colecciones públicas (Regla 1)
+            const productsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+            const tandasCollection = collection(db, 'artifacts', appId, 'public', 'data', 'tandas');
+
+            // Listener en tiempo real para Productos
+            onSnapshot(productsCollection, (querySnapshot) => {
+                const list = [];
+                querySnapshot.forEach((doc) => {
+                    list.push({ id: doc.id, ...doc.data() });
+                });
+                state.products = list;
+                
+                // Actualizar dropdowns y vistas
+                populateProductDropdown();
+                renderInventario();
+                renderDashboard();
+                actualizarIndicadorConectado();
+            }, (error) => {
+                console.error("Error al leer productos:", error);
+            });
+
+            // Listener en tiempo real para Tandas
+            onSnapshot(tandasCollection, (querySnapshot) => {
+                const list = [];
+                querySnapshot.forEach((doc) => {
+                    list.push({ id: doc.id, ...doc.data() });
+                });
+                state.tandas = list;
+                
+                renderTandas();
+                renderDashboard();
+                actualizarIndicadorConectado();
+            }, (error) => {
+                console.error("Error al leer tandas:", error);
+            });
+        }
+
+        function actualizarIndicadorConectado() {
+            const ind = document.getElementById('sync-indicator');
+            ind.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-semibold";
+            ind.innerHTML = `
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Nube Sincronizada
+            `;
+        }
+
+        // --- OPERACIONES DE FIREBASE (ESCRITURA Y ELIMINACIÓN) ---
+
+        // Guardar/Crear Tanda
+        window.saveTanda = async function(event) {
+            event.preventDefault();
+            if (!userAuthenticated) return;
+
+            const id = document.getElementById('tanda-id').value;
+            const client = document.getElementById('tanda-client').value;
+            const phone = document.getElementById('tanda-phone').value;
+            const slotNumber = parseInt(document.getElementById('tanda-number').value) || null;
+            const productId = document.getElementById('tanda-product').value;
+            const amount = parseFloat(document.getElementById('tanda-amount').value);
+            const installments = parseInt(document.getElementById('tanda-installments').value);
+            const frequency = document.getElementById('tanda-frequency').value;
+            const date = document.getElementById('tanda-date').value;
+
+            const product = state.products.find(p => p.id === productId);
+            const productName = product ? product.name : "Producto Desconocido";
+
+            const tandaDocRef = id 
+                ? doc(db, 'artifacts', appId, 'public', 'data', 'tandas', id)
+                : doc(collection(db, 'artifacts', appId, 'public', 'data', 'tandas'));
+
+            let paymentsArray;
+            if (id) {
+                // Editar tanda existente
+                const existente = state.tandas.find(t => t.id === id);
+                const originalPayments = existente ? existente.payments : [];
+                paymentsArray = [...originalPayments];
+
+                if (installments !== originalPayments.length) {
+                    if (installments > originalPayments.length) {
+                        const diff = installments - originalPayments.length;
+                        paymentsArray = [...originalPayments, ...Array(diff).fill(false)];
+                    } else {
+                        paymentsArray = originalPayments.slice(0, installments);
+                    }
+                }
+            } else {
+                // Tanda nueva
+                paymentsArray = Array(installments).fill(false);
+                
+                // Descontar una unidad del stock del producto
+                if (product && product.stock > 0) {
+                    const productDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', product.id);
+                    await updateDoc(productDocRef, {
+                        stock: product.stock - 1
+                    });
+                }
+            }
+
+            const payload = {
+                clientName: client,
+                clientPhone: phone,
+                productId,
+                productName,
+                totalAmount: amount,
+                numInstallments: installments,
+                frequency,
+                startDate: date,
+                slotNumber,
+                payments: paymentsArray
+            };
+
+            try {
+                await setDoc(tandaDocRef, payload);
+                showToast(id ? "Tanda actualizada en la nube" : "¡Nueva tanda creada con éxito!");
+                closeTandaModal();
+            } catch (err) {
+                console.error("Error al guardar tanda:", err);
+                showToast("Hubo un error al guardar", "error");
+            }
+        };
+
+        // Eliminar Tanda
+        window.deleteTanda = async function(id) {
+            if (!userAuthenticated) return;
+            if (confirm("¿Estás seguro de que deseas eliminar esta tanda? Se borrará de la nube para todos.")) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'tandas', id);
+                    await deleteDoc(docRef);
+                    showToast("Tanda eliminada con éxito", "error");
+                } catch (error) {
+                    console.error("Error al borrar tanda:", error);
+                }
+            }
+        };
+
+        // Guardar/Crear Producto
+        window.saveProduct = async function(event) {
+            event.preventDefault();
+            if (!userAuthenticated) return;
+
+            const id = document.getElementById('product-id').value;
+            const name = document.getElementById('product-name').value;
+            const cost = parseFloat(document.getElementById('product-cost').value);
+            const price = parseFloat(document.getElementById('product-price').value);
+            const stock = parseInt(document.getElementById('product-stock').value);
+
+            const productDocRef = id 
+                ? doc(db, 'artifacts', appId, 'public', 'data', 'products', id)
+                : doc(collection(db, 'artifacts', appId, 'public', 'data', 'products'));
+
+            const payload = {
+                name, cost, price, stock
+            };
+
+            try {
+                await setDoc(productDocRef, payload);
+                showToast(id ? "Producto modificado" : "Producto agregado al catálogo");
+                closeProductModal();
+            } catch (err) {
+                console.error("Error al guardar producto:", err);
+            }
+        };
+
+        // Eliminar Producto
+        window.deleteProduct = async function(id) {
+            if (!userAuthenticated) return;
+            const enUso = state.tandas.some(t => t.productId === id);
+            if (enUso) {
+                alert("No puedes eliminar este producto porque está asignado a una tanda activa.");
+                return;
+            }
+
+            if (confirm("¿Deseas eliminar este producto del catálogo en la nube?")) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
+                    await deleteDoc(docRef);
+                    showToast("Producto eliminado", "error");
+                } catch (error) {
+                    console.error("Error al borrar producto:", error);
+                }
+            }
+        };
+
+        // Togglear un pago individual desde la tarjeta
+        window.togglePaymentState = async function(tandaId, index) {
+            if (!userAuthenticated) return;
+            const t = state.tandas.find(t => t.id === tandaId);
+            if (t) {
+                const newPayments = [...t.payments];
+                newPayments[index] = !newPayments[index];
+                
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'tandas', tandaId);
+                    await updateDoc(docRef, { payments: newPayments });
+                    showToast(`Abono ${index + 1} modificado para ${t.clientName}`);
+                } catch (error) {
+                    console.error("Error al actualizar pago:", error);
+                }
+            }
+        };
+
+        // Registrar abono rápido desde la tabla del tablero
+        window.abonaTanda = async function(tandaId, index) {
+            if (!userAuthenticated) return;
+            const t = state.tandas.find(t => t.id === tandaId);
+            if (t) {
+                const newPayments = [...t.payments];
+                newPayments[index] = true;
+                
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'tandas', tandaId);
+                    await updateDoc(docRef, { payments: newPayments });
+                    showToast(`Abono ${index + 1} de $${(t.totalAmount / t.numInstallments).toFixed(0)} cobrado con éxito`);
+                } catch (error) {
+                    console.error("Error al registrar abono:", error);
+                }
+            }
+        };
+
+        // --- SISTEMA DE NAVEGACIÓN ---
+        window.switchTab = function(tabId) {
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-tandas').classList.add('hidden');
+            document.getElementById('tab-inventario').classList.add('hidden');
+
+            const navIds = ['dashboard', 'tandas', 'inventario'];
+            navIds.forEach(id => {
+                const btn = document.getElementById(`nav-${id}`);
+                btn.className = "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-slate-200";
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.className = "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 bg-indigo-600 text-white";
+
+            renderDashboard();
+            renderTandas();
+            renderInventario();
+        };
+
+        // --- INTERFAZ GRAFICA (RENDERERS ADAPTADOS) ---
+        function renderDashboard() {
+            let totalVendido = 0;
+            let totalCobrado = 0;
+            let totalCostoInvertido = 0;
+
+            state.tandas.forEach(t => {
+                totalVendido += t.totalAmount;
+                const paymentAmount = t.totalAmount / t.numInstallments;
+                const paidCount = t.payments.filter(p => p).length;
+                totalCobrado += (paymentAmount * paidCount);
+
+                const product = state.products.find(p => p.id === t.productId);
+                if (product) {
+                    totalCostoInvertido += product.cost;
+                }
+            });
+
+            const totalPendiente = totalVendido - totalCobrado;
+            const gananciaEstimada = totalVendido - totalCostoInvertido;
+
+            document.getElementById('stat-total-ventas').innerText = formatCurrency(totalVendido);
+            document.getElementById('stat-total-cobrado').innerText = formatCurrency(totalCobrado);
+            document.getElementById('stat-total-pendiente').innerText = formatCurrency(totalPendiente);
+            document.getElementById('stat-total-ganancia').innerText = formatCurrency(gananciaEstimada > 0 ? gananciaEstimada : 0);
+
+            const porcentajeCobrado = totalVendido > 0 ? Math.round((totalCobrado / totalVendido) * 100) : 0;
+            document.getElementById('stat-cobrado-porcentaje').innerText = `${porcentajeCobrado}%`;
+
+            const proximosTable = document.getElementById('table-proximos-pagos');
+            proximosTable.innerHTML = '';
+
+            const tandasPendientes = state.tandas.filter(t => t.payments.includes(false));
+
+            if (tandasPendientes.length === 0) {
+                proximosTable.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">
+                            🎉 ¡Todos los pagos de las tandas están al día!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tandasPendientes.forEach(t => {
+                const pendingAmount = t.totalAmount - ( (t.totalAmount / t.numInstallments) * t.payments.filter(p => p).length );
+                const indexUltimoPago = t.payments.indexOf(false);
+                const abonoIndividual = t.totalAmount / t.numInstallments;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/40 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-4 py-3.5">
+                        <div class="font-bold text-slate-200">${t.clientName}</div>
+                        <div class="text-xs text-slate-500">${t.clientPhone || 'Sin teléfono'}</div>
+                    </td>
+                    <td class="px-4 py-3.5">
+                        <span class="text-indigo-400 font-semibold text-xs bg-indigo-500/10 px-2 py-1 rounded">N° ${t.slotNumber || '-'}</span>
+                        <span class="text-xs text-slate-400 truncate max-w-[120px] inline-block align-middle ml-1">${t.productName}</span>
+                    </td>
+                    <td class="px-4 py-3.5 font-semibold text-amber-500">
+                        ${formatCurrency(abonoIndividual)}
+                    </td>
+                    <td class="px-4 py-3.5 text-slate-400">
+                        ${formatCurrency(pendingAmount)}
+                    </td>
+                    <td class="px-4 py-3.5 text-right">
+                        <button onclick="abonaTanda('${t.id}', ${indexUltimoPago})" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ml-auto">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Cobrar
+                        </button>
+                    </td>
+                `;
+                proximosTable.appendChild(tr);
+            });
+        }
+
+        function renderTandas() {
+            const container = document.getElementById('tandas-container');
+            container.innerHTML = '';
+
+            if (state.tandas.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800 border-dashed text-slate-500">
+                        No hay ninguna tanda registrada en la nube. Haz clic en "Nueva Tanda".
+                    </div>
+                `;
+                return;
+            }
+
+            state.tandas.forEach(t => {
+                const totalPagados = t.payments.filter(p => p).length;
+                const abonoValor = t.totalAmount / t.numInstallments;
+                const montoCobrado = abonoValor * totalPagados;
+                const porcentaje = Math.round((montoCobrado / t.totalAmount) * 100);
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-all shadow-lg";
+                
+                let paymentsGridHTML = '';
+                t.payments.forEach((p, idx) => {
+                    const statusClass = p 
+                        ? 'bg-emerald-500 border-emerald-400 text-slate-950 font-bold' 
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-indigo-500';
+                    paymentsGridHTML += `
+                        <button onclick="togglePaymentState('${t.id}', ${idx})" 
+                            title="Abono ${idx + 1}: ${formatCurrency(abonoValor)}"
+                            class="w-8 h-8 rounded-lg border text-xs flex items-center justify-center font-semibold transition-all ${statusClass}">
+                            ${idx + 1}
+                        </button>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                                    ${t.clientName}
+                                    ${t.slotNumber ? `<span class="bg-indigo-600/20 text-indigo-400 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded">N° ${t.slotNumber}</span>` : ''}
+                                </h3>
+                                <p class="text-xs text-slate-400">${t.clientPhone || 'Sin teléfono'}</p>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <button onclick="editTanda('${t.id}')" class="p-1 text-slate-400 hover:text-slate-100" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <button onclick="deleteTanda('${t.id}')" class="p-1 text-slate-400 hover:text-red-400" title="Eliminar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-850/50 mb-4">
+                            <span class="text-[10px] text-indigo-400 uppercase font-semibold block">Producto</span>
+                            <span class="text-sm font-semibold text-slate-200 block truncate">${t.productName}</span>
+                            <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-800 text-xs text-slate-400">
+                                <span><strong>${t.frequency}</strong></span>
+                                <span>Total: <strong class="text-emerald-400">${formatCurrency(t.totalAmount)}</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 space-y-1">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="text-slate-400">Progreso de Pago</span>
+                                <span class="text-indigo-400">${porcentaje}% (${totalPagados}/${t.payments.length})</span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-850">
+                                <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full transition-all" style="width: ${porcentaje}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-500 pt-0.5">
+                                <span>Cobrado: ${formatCurrency(montoCobrado)}</span>
+                                <span>Resta: ${formatCurrency(t.totalAmount - montoCobrado)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold block mb-2">Presiona un abono para marcar/desmarcar:</span>
+                        <div class="flex flex-wrap gap-2">
+                            ${paymentsGridHTML}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderInventario() {
+            const tableBody = document.getElementById('table-productos');
+            tableBody.innerHTML = '';
+
+            if (state.products.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                            Cargando catálogo...
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            state.products.forEach(p => {
+                const ganancia = p.price - p.cost;
+                const margen = p.price > 0 ? Math.round((ganancia / p.price) * 100) : 0;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/40 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-semibold text-slate-200">
+                        ${p.name}
+                    </td>
+                    <td class="px-6 py-4 text-slate-300">
+                        ${formatCurrency(p.cost)}
+                    </td>
+                    <td class="px-6 py-4 text-emerald-400 font-semibold">
+                        ${formatCurrency(p.price)}
+                    </td>
+                    <td class="px-6 py-4 text-violet-400">
+                        <div class="font-semibold">${formatCurrency(ganancia)}</div>
+                        <div class="text-[10px] text-slate-400">Margen: ${margen}%</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${p.stock > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
+                            ${p.stock} pzas
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex gap-2 justify-end">
+                            <button onclick="editProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-slate-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <button onclick="deleteProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // --- MANEJO DE DROPDOWNS ---
+        function populateProductDropdown(selectedId = '') {
+            const dropdown = document.getElementById('tanda-product');
+            if (!dropdown) return;
+            dropdown.innerHTML = '';
+            
+            state.products.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.text = `${p.name} (${formatCurrency(p.price)})`;
+                if (p.id === selectedId) option.selected = true;
+                dropdown.appendChild(option);
+            });
+
+            updateTandaProductAmount();
+        }
+
+        function updateTandaProductAmount() {
+            const dropdown = document.getElementById('tanda-product');
+            const amountInput = document.getElementById('tanda-amount');
+            if (!dropdown || !amountInput) return;
+            
+            const selectedId = dropdown.value;
+            const product = state.products.find(p => p.id === selectedId);
+            if (product) {
+                amountInput.value = product.price;
+            }
+        }
+
+        // Registrar cambios en el combo de productos
+        document.getElementById('tanda-product').addEventListener('change', updateTandaProductAmount);
+
+        // --- APERTURA DE MODALES ---
+        window.openTandaModal = function() {
+            document.getElementById('tanda-modal-title').innerText = "Registrar Nueva Tanda";
+            document.getElementById('tanda-id').value = '';
+            document.getElementById('form-tanda').reset();
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('tanda-date').value = hoy;
+
+            populateProductDropdown();
+            document.getElementById('modal-tanda').classList.remove('hidden');
+        };
+
+        window.closeTandaModal = function() {
+            document.getElementById('modal-tanda').classList.add('hidden');
+        };
+
+        window.editTanda = function(id) {
+            const t = state.tandas.find(t => t.id === id);
+            if (!t) return;
+
+            document.getElementById('tanda-modal-title').innerText = "Editar Tanda";
+            document.getElementById('tanda-id').value = t.id;
+            document.getElementById('tanda-client').value = t.clientName;
+            document.getElementById('tanda-phone').value = t.clientPhone || '';
+            document.getElementById('tanda-number').value = t.slotNumber || '';
+            document.getElementById('tanda-amount').value = t.totalAmount;
+            document.getElementById('tanda-installments').value = t.numInstallments;
+            document.getElementById('tanda-frequency').value = t.frequency;
+            document.getElementById('tanda-date').value = t.startDate;
+
+            populateProductDropdown(t.productId);
+            document.getElementById('modal-tanda').classList.remove('hidden');
+        };
+
+        window.openProductModal = function() {
+            document.getElementById('product-modal-title').innerText = "Registrar Producto";
+            document.getElementById('product-id').value = '';
+            document.getElementById('form-product').reset();
+            document.getElementById('product-stock').value = '1';
+            document.getElementById('modal-product').classList.remove('hidden');
+        };
+
+        window.closeProductModal = function() {
+            document.getElementById('modal-product').classList.add('hidden');
+        };
+
+        window.editProduct = function(id) {
+            const p = state.products.find(p => p.id === id);
+            if (!p) return;
+
+            document.getElementById('product-modal-title').innerText = "Editar Producto";
+            document.getElementById('product-id').value = p.id;
+            document.getElementById('product-name').value = p.name;
+            document.getElementById('product-cost').value = p.cost;
+            document.getElementById('product-price').value = p.price;
+            document.getElementById('product-stock').value = p.stock;
+            document.getElementById('modal-product').classList.remove('hidden');
+        };
+
+        // --- SISTEMA DE TOASTS ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
+            const icon = type === 'success' 
+                ? `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
+                : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+            toast.className = `flex items-center gap-3 ${bgColor} text-white text-sm font-medium py-3 px-4 rounded-xl shadow-xl pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+
+        // --- UTILERIAS ---
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN'
+            }).format(value);
+        }
+
+        // Carga inicial estática por si tarda la conexión
+        renderDashboard();
+    </script>
+</body>
+</html>
