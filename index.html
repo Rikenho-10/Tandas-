@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TandaManager Pro | Control Compartido</title>
-    <!-- Tailwind CSS para un diseño premium oscuro -->
+    <!-- Tailwind CSS para diseño moderno e interactivo -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -35,39 +35,38 @@
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg shadow-indigo-500/20">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <!-- Icono de Rayo / Rock & Roll -->
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">TandaManager Pro</h1>
                     <div class="flex items-center gap-2">
-                        <p class="text-xs text-indigo-400 font-medium tracking-wider uppercase">Ventas Compartidas</p>
-                        <!-- Indicador de conexión en la nube -->
-                        <span id="sync-indicator" class="inline-flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full font-semibold">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                            Conectando nube...
+                        <span id="sync-badge" class="inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer" onclick="openSyncModal()">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="sync-dot"></span>
+                            <span id="sync-text">Solo Local (Toca para conectar)</span>
                         </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Menú de Navegación -->
+            <!-- Menú de Navegación principal -->
             <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 bg-indigo-600 text-white">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
                     Tablero
                 </button>
-                <button onclick="switchTab('tandas')" id="nav-tandas" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-slate-200">
+                <button onclick="switchTab('tandas')" id="nav-tandas" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
                     Tandas
                 </button>
-                <button onclick="switchTab('inventario')" id="nav-inventario" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-slate-200">
-                    Productos
+                <button onclick="switchTab('inventario')" id="nav-inventario" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
+                    Catálogo
                 </button>
             </nav>
         </div>
     </header>
 
-    <!-- NOTIFICACIONES TEMPORALES -->
+    <!-- NOTIFICACIONES (TOASTS) -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -81,9 +80,9 @@
                     <div class="absolute -right-4 -bottom-4 text-emerald-500/10">
                         <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <p class="text-sm text-slate-400 font-medium">Total Ventas (Tandas)</p>
+                    <p class="text-sm text-slate-400 font-medium">Total de Ventas</p>
                     <p class="text-2xl font-bold mt-1 text-slate-100" id="stat-total-ventas">$0.00</p>
-                    <div class="text-xs text-indigo-400 mt-2 font-semibold">Valor de mercancía colocada</div>
+                    <div class="text-xs text-indigo-400 mt-2 font-semibold">Valor de mercancía en tanda</div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
@@ -93,7 +92,7 @@
                     <p class="text-sm text-slate-400 font-medium">Total Cobrado</p>
                     <p class="text-2xl font-bold mt-1 text-emerald-400" id="stat-total-cobrado">$0.00</p>
                     <div class="text-xs text-emerald-500 mt-2 font-semibold flex items-center gap-1">
-                        <span id="stat-cobrado-porcentaje">0%</span> cobrado en total
+                        <span id="stat-cobrado-porcentaje">0%</span> del dinero cobrado
                     </div>
                 </div>
 
@@ -103,7 +102,7 @@
                     </div>
                     <p class="text-sm text-slate-400 font-medium">Pendiente por Cobrar</p>
                     <p class="text-2xl font-bold mt-1 text-amber-400" id="stat-total-pendiente">$0.00</p>
-                    <div class="text-xs text-amber-500 mt-2 font-semibold">Dinero activo en tandas</div>
+                    <div class="text-xs text-amber-500 mt-2 font-semibold">Dinero en la calle actualmente</div>
                 </div>
 
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
@@ -113,7 +112,7 @@
                     <p class="text-sm text-slate-400 font-medium">Ganancia Estimada</p>
                     <p class="text-2xl font-bold mt-1 text-violet-400" id="stat-total-ganancia">$0.00</p>
                     <div class="text-xs text-violet-500 mt-2 font-semibold flex items-center gap-1">
-                        Diferencia de costo/venta
+                        Utilidad libre de costos
                     </div>
                 </div>
             </div>
@@ -124,25 +123,21 @@
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 lg:col-span-2">
                     <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        Cobros sugeridos para hoy
+                        Cobros Sugeridos (Próximo abono pendiente)
                     </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-slate-300">
                             <thead class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider">
                                 <tr>
                                     <th class="px-4 py-3 rounded-l-lg">Cliente</th>
-                                    <th class="px-4 py-3">Tanda / N°</th>
-                                    <th class="px-4 py-3">Abono Pendiente</th>
-                                    <th class="px-4 py-3">Total Restante</th>
+                                    <th class="px-4 py-3">Tanda / Sorteo</th>
+                                    <th class="px-4 py-3">Monto Abono</th>
+                                    <th class="px-4 py-3">Deuda Restante</th>
                                     <th class="px-4 py-3 rounded-r-lg text-right">Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="table-proximos-pagos" class="divide-y divide-slate-800/50">
-                                <tr>
-                                    <td colspan="5" class="px-4 py-8 text-center text-slate-500">
-                                        Cargando datos compartidos de la nube...
-                                    </td>
-                                </tr>
+                                <!-- Llenado dinámico -->
                             </tbody>
                         </table>
                     </div>
@@ -152,7 +147,7 @@
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
                         <h3 class="text-lg font-bold text-slate-100 mb-2">Acceso Rápido</h3>
-                        <p class="text-slate-400 text-sm mb-4">Usa estos botones para alimentar el sistema compartido.</p>
+                        <p class="text-slate-400 text-sm mb-4">Alimenta el control de tu tanda con tu esposa rápidamente.</p>
                         
                         <div class="space-y-3">
                             <button onclick="openTandaModal()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-medium py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
@@ -161,15 +156,16 @@
                             </button>
                             <button onclick="switchTab('inventario'); openProductModal();" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-700">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                                Registrar Producto Cerrado
+                                Agregar Producto Cerrado
                             </button>
                         </div>
                     </div>
 
                     <div class="mt-6 border-t border-slate-800 pt-4 text-center">
-                        <span class="text-xs text-indigo-400 font-medium">
-                            💡 Ambos pueden abrir la app simultáneamente. ¡Los cambios se guardan al instante!
-                        </span>
+                        <button onclick="openSyncModal()" class="text-xs text-indigo-400 font-bold hover:underline flex items-center justify-center gap-1.5 w-full">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            ¿Cómo sincronizar con mi esposa?
+                        </button>
                     </div>
                 </div>
             </div>
@@ -179,8 +175,8 @@
         <section id="tab-tandas" class="space-y-6 hidden">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-100">Control de Tandas Activas</h2>
-                    <p class="text-slate-400 text-sm">Monitorea los números, abonos y progreso de tus clientes.</p>
+                    <h2 class="text-2xl font-bold text-slate-100">Control de Tandas</h2>
+                    <p class="text-slate-400 text-sm">Monitorea los abonos y avance de cada cliente.</p>
                 </div>
                 <button onclick="openTandaModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all text-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -190,7 +186,7 @@
 
             <!-- Grid de Tandas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tandas-container">
-                <!-- Cartas de tandas creadas dinámicamente -->
+                <!-- Render dinámico -->
             </div>
         </section>
 
@@ -199,7 +195,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-100">Catálogo de Productos Cerrados</h2>
-                    <p class="text-slate-400 text-sm">Registra y edita la mercancía disponible para tandas.</p>
+                    <p class="text-slate-400 text-sm">Administra costos, precios y existencias físicas.</p>
                 </div>
                 <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all text-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -217,7 +213,7 @@
                                 <th class="px-6 py-4">Precio Costo</th>
                                 <th class="px-6 py-4">Precio Venta</th>
                                 <th class="px-6 py-4">Ganancia Directa</th>
-                                <th class="px-6 py-4">Stock Disponible</th>
+                                <th class="px-6 py-4">Stock</th>
                                 <th class="px-6 py-4 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -233,8 +229,46 @@
 
     <!-- FOOTER -->
     <footer class="mt-auto border-t border-slate-800 bg-slate-900/40 py-4 text-center text-xs text-slate-500">
-        <p>TandaManager Pro &copy; 2026. Diseñado para control privado de ventas.</p>
+        <p>TandaManager Pro &copy; 2026. Control privado de ventas compartido.</p>
     </footer>
+
+    <!-- ================= MODAL: CONFIGURAR SINCRONIZACIÓN ================= -->
+    <div id="modal-sync" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 class="font-bold text-slate-100 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                    Sincronización Compartida
+                </h3>
+                <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-400">
+                    Para que tu esposa y tú vean los mismos datos en tiempo real en sus celulares, inventen una <strong>Contraseña Única de Sincronización</strong> y escríbanla exactamente igual en ambos teléfonos.
+                </p>
+
+                <div>
+                    <label class="block text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Código / Contraseña Secreta</label>
+                    <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Ej: tanda-ricardo-paty-26">
+                </div>
+
+                <div class="bg-indigo-950/20 rounded-xl border border-indigo-800/30 p-3 space-y-1">
+                    <div class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">Estado Actual:</div>
+                    <div class="text-xs text-slate-300 font-semibold flex items-center gap-2">
+                        <span id="modal-sync-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                        <span id="modal-sync-status-text">Guardando de manera local (Sin sincronizar)</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" id="btn-desconectar" onclick="desconectarNube()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-xs border border-slate-700 transition-all hidden">Desconectar</button>
+                    <button type="button" onclick="conectarNube()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg shadow-indigo-600/10">Sincronizar Celulares</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ================= MODAL: NUEVA / EDITAR TANDA ================= -->
     <div id="modal-tanda" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all">
@@ -245,7 +279,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <form id="form-tanda" class="p-6 space-y-4">
+            <form onsubmit="saveTanda(event)" class="p-6 space-y-4">
                 <input type="hidden" id="tanda-id">
                 
                 <div>
@@ -259,15 +293,15 @@
                         <input type="text" id="tanda-phone" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Opcional">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Número de Sorteo/Turno</label>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">N° Tanda (Sorteo)</label>
                         <input type="number" id="tanda-number" min="1" max="100" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all" placeholder="Ej. 3">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Producto Vendido</label>
-                    <select id="tanda-product" required class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all">
-                        <!-- Cargados dinámicamente -->
+                    <select id="tanda-product" required onchange="updateTandaProductAmount()" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all">
+                        <!-- Llenado dinámico -->
                     </select>
                 </div>
 
@@ -309,12 +343,12 @@
     <div id="modal-product" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
             <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-                <h3 class="font-bold text-slate-100" id="product-modal-title">Registrar Producto Cerrado</h3>
+                <h3 class="font-bold text-slate-100" id="product-modal-title">Registrar Producto</h3>
                 <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <form id="form-product" class="p-6 space-y-4">
+            <form onsubmit="saveProduct(event)" class="p-6 space-y-4">
                 <input type="hidden" id="product-id">
                 
                 <div>
@@ -334,7 +368,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Cantidad en Inventario (Stock)</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Stock Disponible</label>
                     <input type="number" id="product-stock" required min="0" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none transition-all" placeholder="Unidades disponibles">
                 </div>
 
@@ -346,286 +380,60 @@
         </div>
     </div>
 
-    <!-- ================= CONEXIÓN FIREBASE + LÓGICA ================= -->
-    <script type="module">
-        // Importar Firebase SDKs desde CDN
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- ================= MODAL DE CONFIRMACIÓN DE ELIMINACIÓN (SIN ALERTS) ================= -->
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center space-y-4">
+            <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-100">¿Estás completamente seguro?</h3>
+            <p class="text-xs text-slate-400" id="confirm-modal-text">Esta acción borrará la información de manera definitiva.</p>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-xs border border-slate-700 transition-all">Cancelar</button>
+                <button onclick="closeConfirmModal(true)" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-semibold text-xs transition-all">Eliminar</button>
+            </div>
+        </div>
+    </div>
 
-        // Obtener variables de entorno o defaults
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tanda-manager-shared-app';
-        const firebaseConfig = JSON.parse(__firebase_config);
+    <!-- ================= SISTEMA JAVASCRIPT GARANTIZADO (NO SE CONGELA) ================= -->
+    <script>
+        // Bucket único para la sincronización gratuita e instantánea
+        const BUCKET_NAME = "ricardo_tandas_app_2026";
+        let syncCode = localStorage.getItem('tanda_sync_code') || "";
+        let syncInterval = null;
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Estado local en sincronía con la nube
-        let state = {
-            products: [],
-            tandas: []
-        };
-
-        let userAuthenticated = null;
-
-        // --- SISTEMA DE AUTENTICACIÓN (REGLA 3) ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+        // Base de Datos en Memoria con los gustos rockeros y futboleros de Ricardo de ejemplo
+        let defaultState = {
+            products: [
+                { id: "p1", name: "Guns N' Roses: Appetite for Destruction Super Deluxe", cost: 1200, price: 2500, stock: 3 },
+                { id: "p2", name: "Jersey Oficial Club América Campeón 2026", cost: 600, price: 1300, stock: 8 },
+                { id: "p3", name: "Perfume Cerrado Imperial Rocker Edition", cost: 400, price: 950, stock: 12 }
+            ],
+            tandas: [
+                {
+                    id: "t1",
+                    clientName: "Carlos Pérez",
+                    clientPhone: "555-123-4567",
+                    productId: "p1",
+                    productName: "Guns N' Roses: Appetite for Destruction Super Deluxe",
+                    totalAmount: 2500,
+                    numInstallments: 10,
+                    frequency: "Semanal",
+                    startDate: "2026-06-01",
+                    slotNumber: 3,
+                    payments: [true, true, true, false, false, false, false, false, false, false]
                 }
-            } catch (error) {
-                console.error("Error al autenticar:", error);
-                document.getElementById('sync-indicator').innerHTML = `
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                    Error de sincronización
-                `;
-            }
+            ]
         };
 
-        // Escuchar cambios de Auth
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userAuthenticated = user;
-                // Una vez autenticado, conectar los listeners de tiempo real
-                conectarNube();
-            } else {
-                userAuthenticated = null;
-            }
-        });
+        // Cargar Base de datos local
+        let state = JSON.parse(localStorage.getItem('tanda_local_state')) || defaultState;
 
-        // Ejecutar proceso de autenticación de inmediato
-        initAuth();
+        // Callback para la confirmación de eliminación segura
+        let onConfirmAction = null;
 
-        // --- COLECTAR Y SINCRONIZAR DATOS EN TIEMPO REAL (REGLAS 1 Y 2) ---
-        function conectarNube() {
-            if (!userAuthenticated) return;
-
-            // Ruta estricta de colecciones públicas (Regla 1)
-            const productsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-            const tandasCollection = collection(db, 'artifacts', appId, 'public', 'data', 'tandas');
-
-            // Listener en tiempo real para Productos
-            onSnapshot(productsCollection, (querySnapshot) => {
-                const list = [];
-                querySnapshot.forEach((doc) => {
-                    list.push({ id: doc.id, ...doc.data() });
-                });
-                state.products = list;
-                
-                // Actualizar dropdowns y vistas
-                populateProductDropdown();
-                renderInventario();
-                renderDashboard();
-                actualizarIndicadorConectado();
-            }, (error) => {
-                console.error("Error al leer productos:", error);
-            });
-
-            // Listener en tiempo real para Tandas
-            onSnapshot(tandasCollection, (querySnapshot) => {
-                const list = [];
-                querySnapshot.forEach((doc) => {
-                    list.push({ id: doc.id, ...doc.data() });
-                });
-                state.tandas = list;
-                
-                renderTandas();
-                renderDashboard();
-                actualizarIndicadorConectado();
-            }, (error) => {
-                console.error("Error al leer tandas:", error);
-            });
-        }
-
-        function actualizarIndicadorConectado() {
-            const ind = document.getElementById('sync-indicator');
-            ind.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-semibold";
-            ind.innerHTML = `
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Nube Sincronizada
-            `;
-        }
-
-        // --- OPERACIONES DE FIREBASE (ESCRITURA Y ELIMINACIÓN) ---
-
-        // Guardar/Crear Tanda
-        window.saveTanda = async function(event) {
-            event.preventDefault();
-            if (!userAuthenticated) return;
-
-            const id = document.getElementById('tanda-id').value;
-            const client = document.getElementById('tanda-client').value;
-            const phone = document.getElementById('tanda-phone').value;
-            const slotNumber = parseInt(document.getElementById('tanda-number').value) || null;
-            const productId = document.getElementById('tanda-product').value;
-            const amount = parseFloat(document.getElementById('tanda-amount').value);
-            const installments = parseInt(document.getElementById('tanda-installments').value);
-            const frequency = document.getElementById('tanda-frequency').value;
-            const date = document.getElementById('tanda-date').value;
-
-            const product = state.products.find(p => p.id === productId);
-            const productName = product ? product.name : "Producto Desconocido";
-
-            const tandaDocRef = id 
-                ? doc(db, 'artifacts', appId, 'public', 'data', 'tandas', id)
-                : doc(collection(db, 'artifacts', appId, 'public', 'data', 'tandas'));
-
-            let paymentsArray;
-            if (id) {
-                // Editar tanda existente
-                const existente = state.tandas.find(t => t.id === id);
-                const originalPayments = existente ? existente.payments : [];
-                paymentsArray = [...originalPayments];
-
-                if (installments !== originalPayments.length) {
-                    if (installments > originalPayments.length) {
-                        const diff = installments - originalPayments.length;
-                        paymentsArray = [...originalPayments, ...Array(diff).fill(false)];
-                    } else {
-                        paymentsArray = originalPayments.slice(0, installments);
-                    }
-                }
-            } else {
-                // Tanda nueva
-                paymentsArray = Array(installments).fill(false);
-                
-                // Descontar una unidad del stock del producto
-                if (product && product.stock > 0) {
-                    const productDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', product.id);
-                    await updateDoc(productDocRef, {
-                        stock: product.stock - 1
-                    });
-                }
-            }
-
-            const payload = {
-                clientName: client,
-                clientPhone: phone,
-                productId,
-                productName,
-                totalAmount: amount,
-                numInstallments: installments,
-                frequency,
-                startDate: date,
-                slotNumber,
-                payments: paymentsArray
-            };
-
-            try {
-                await setDoc(tandaDocRef, payload);
-                showToast(id ? "Tanda actualizada en la nube" : "¡Nueva tanda creada con éxito!");
-                closeTandaModal();
-            } catch (err) {
-                console.error("Error al guardar tanda:", err);
-                showToast("Hubo un error al guardar", "error");
-            }
-        };
-
-        // Eliminar Tanda
-        window.deleteTanda = async function(id) {
-            if (!userAuthenticated) return;
-            if (confirm("¿Estás seguro de que deseas eliminar esta tanda? Se borrará de la nube para todos.")) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'tandas', id);
-                    await deleteDoc(docRef);
-                    showToast("Tanda eliminada con éxito", "error");
-                } catch (error) {
-                    console.error("Error al borrar tanda:", error);
-                }
-            }
-        };
-
-        // Guardar/Crear Producto
-        window.saveProduct = async function(event) {
-            event.preventDefault();
-            if (!userAuthenticated) return;
-
-            const id = document.getElementById('product-id').value;
-            const name = document.getElementById('product-name').value;
-            const cost = parseFloat(document.getElementById('product-cost').value);
-            const price = parseFloat(document.getElementById('product-price').value);
-            const stock = parseInt(document.getElementById('product-stock').value);
-
-            const productDocRef = id 
-                ? doc(db, 'artifacts', appId, 'public', 'data', 'products', id)
-                : doc(collection(db, 'artifacts', appId, 'public', 'data', 'products'));
-
-            const payload = {
-                name, cost, price, stock
-            };
-
-            try {
-                await setDoc(productDocRef, payload);
-                showToast(id ? "Producto modificado" : "Producto agregado al catálogo");
-                closeProductModal();
-            } catch (err) {
-                console.error("Error al guardar producto:", err);
-            }
-        };
-
-        // Eliminar Producto
-        window.deleteProduct = async function(id) {
-            if (!userAuthenticated) return;
-            const enUso = state.tandas.some(t => t.productId === id);
-            if (enUso) {
-                alert("No puedes eliminar este producto porque está asignado a una tanda activa.");
-                return;
-            }
-
-            if (confirm("¿Deseas eliminar este producto del catálogo en la nube?")) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
-                    await deleteDoc(docRef);
-                    showToast("Producto eliminado", "error");
-                } catch (error) {
-                    console.error("Error al borrar producto:", error);
-                }
-            }
-        };
-
-        // Togglear un pago individual desde la tarjeta
-        window.togglePaymentState = async function(tandaId, index) {
-            if (!userAuthenticated) return;
-            const t = state.tandas.find(t => t.id === tandaId);
-            if (t) {
-                const newPayments = [...t.payments];
-                newPayments[index] = !newPayments[index];
-                
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'tandas', tandaId);
-                    await updateDoc(docRef, { payments: newPayments });
-                    showToast(`Abono ${index + 1} modificado para ${t.clientName}`);
-                } catch (error) {
-                    console.error("Error al actualizar pago:", error);
-                }
-            }
-        };
-
-        // Registrar abono rápido desde la tabla del tablero
-        window.abonaTanda = async function(tandaId, index) {
-            if (!userAuthenticated) return;
-            const t = state.tandas.find(t => t.id === tandaId);
-            if (t) {
-                const newPayments = [...t.payments];
-                newPayments[index] = true;
-                
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'tandas', tandaId);
-                    await updateDoc(docRef, { payments: newPayments });
-                    showToast(`Abono ${index + 1} de $${(t.totalAmount / t.numInstallments).toFixed(0)} cobrado con éxito`);
-                } catch (error) {
-                    console.error("Error al registrar abono:", error);
-                }
-            }
-        };
-
-        // --- SISTEMA DE NAVEGACIÓN ---
-        window.switchTab = function(tabId) {
+        // --- SISTEMA DE NAVEGACIÓN RESISTENTE ---
+        function switchTab(tabId) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-tandas').classList.add('hidden');
             document.getElementById('tab-inventario').classList.add('hidden');
@@ -633,20 +441,25 @@
             const navIds = ['dashboard', 'tandas', 'inventario'];
             navIds.forEach(id => {
                 const btn = document.getElementById(`nav-${id}`);
-                btn.className = "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-slate-200";
+                btn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200";
             });
 
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
             const activeBtn = document.getElementById(`nav-${tabId}`);
-            activeBtn.className = "px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 bg-indigo-600 text-white";
+            activeBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white";
 
             renderDashboard();
             renderTandas();
             renderInventario();
-        };
+        }
 
-        // --- INTERFAZ GRAFICA (RENDERERS ADAPTADOS) ---
+        // Guardar Datos localmente
+        function saveLocalState() {
+            localStorage.setItem('tanda_local_state', JSON.stringify(state));
+            subirCambiosALaNube(); // Sincroniza si el código familiar está configurado
+        }
+
+        // --- RENDER DE MÈTRICAS ---
         function renderDashboard() {
             let totalVendido = 0;
             let totalCobrado = 0;
@@ -675,6 +488,7 @@
             const porcentajeCobrado = totalVendido > 0 ? Math.round((totalCobrado / totalVendido) * 100) : 0;
             document.getElementById('stat-cobrado-porcentaje').innerText = `${porcentajeCobrado}%`;
 
+            // Rellenar Próximos Pagos
             const proximosTable = document.getElementById('table-proximos-pagos');
             proximosTable.innerHTML = '';
 
@@ -684,7 +498,7 @@
                 proximosTable.innerHTML = `
                     <tr>
                         <td colspan="5" class="px-4 py-8 text-center text-slate-500">
-                            🎉 ¡Todos los pagos de las tandas están al día!
+                            🤘 ¡Ningún abono pendiente hoy! Todo cobrado.
                         </td>
                     </tr>
                 `;
@@ -701,21 +515,20 @@
                 tr.innerHTML = `
                     <td class="px-4 py-3.5">
                         <div class="font-bold text-slate-200">${t.clientName}</div>
-                        <div class="text-xs text-slate-500">${t.clientPhone || 'Sin teléfono'}</div>
+                        <div class="text-[11px] text-slate-500">${t.clientPhone || 'Sin teléfono'}</div>
                     </td>
                     <td class="px-4 py-3.5">
-                        <span class="text-indigo-400 font-semibold text-xs bg-indigo-500/10 px-2 py-1 rounded">N° ${t.slotNumber || '-'}</span>
-                        <span class="text-xs text-slate-400 truncate max-w-[120px] inline-block align-middle ml-1">${t.productName}</span>
+                        <span class="text-indigo-400 font-bold text-xs bg-indigo-500/10 px-2 py-1 rounded">N° ${t.slotNumber || '-'}</span>
+                        <span class="text-xs text-slate-400 ml-1.5 truncate max-w-[150px] inline-block align-middle">${t.productName}</span>
                     </td>
-                    <td class="px-4 py-3.5 font-semibold text-amber-500">
+                    <td class="px-4 py-3.5 font-bold text-emerald-400">
                         ${formatCurrency(abonoIndividual)}
                     </td>
-                    <td class="px-4 py-3.5 text-slate-400">
+                    <td class="px-4 py-3.5 text-slate-400 font-semibold">
                         ${formatCurrency(pendingAmount)}
                     </td>
                     <td class="px-4 py-3.5 text-right">
-                        <button onclick="abonaTanda('${t.id}', ${indexUltimoPago})" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ml-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <button onclick="abonaTandaRapido('${t.id}', ${indexUltimoPago})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1 shadow">
                             Cobrar
                         </button>
                     </td>
@@ -724,6 +537,7 @@
             });
         }
 
+        // --- RENDER DE TANDAS ---
         function renderTandas() {
             const container = document.getElementById('tandas-container');
             container.innerHTML = '';
@@ -731,7 +545,7 @@
             if (state.tandas.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800 border-dashed text-slate-500">
-                        No hay ninguna tanda registrada en la nube. Haz clic en "Nueva Tanda".
+                        No hay ninguna tanda registrada. Haz clic en "Nueva Tanda".
                     </div>
                 `;
                 return;
@@ -743,70 +557,72 @@
                 const montoCobrado = abonoValor * totalPagados;
                 const porcentaje = Math.round((montoCobrado / t.totalAmount) * 100);
 
-                const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition-all shadow-lg";
-                
                 let paymentsGridHTML = '';
                 t.payments.forEach((p, idx) => {
                     const statusClass = p 
-                        ? 'bg-emerald-500 border-emerald-400 text-slate-950 font-bold' 
+                        ? 'bg-emerald-500 border-emerald-400 text-slate-950 font-bold shadow shadow-emerald-500/20' 
                         : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-indigo-500';
                     paymentsGridHTML += `
                         <button onclick="togglePaymentState('${t.id}', ${idx})" 
                             title="Abono ${idx + 1}: ${formatCurrency(abonoValor)}"
-                            class="w-8 h-8 rounded-lg border text-xs flex items-center justify-center font-semibold transition-all ${statusClass}">
+                            class="w-10 h-10 rounded-xl border text-xs flex items-center justify-center font-bold transition-all ${statusClass}">
                             ${idx + 1}
                         </button>
                     `;
                 });
 
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-750 transition-all shadow-xl relative overflow-hidden";
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start mb-3">
                             <div>
-                                <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                                <h3 class="font-bold text-lg text-slate-100 flex items-center gap-1.5">
                                     ${t.clientName}
-                                    ${t.slotNumber ? `<span class="bg-indigo-600/20 text-indigo-400 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded">N° ${t.slotNumber}</span>` : ''}
+                                    ${t.slotNumber ? `<span class="bg-indigo-600/20 text-indigo-400 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">N° ${t.slotNumber}</span>` : ''}
                                 </h3>
                                 <p class="text-xs text-slate-400">${t.clientPhone || 'Sin teléfono'}</p>
                             </div>
-                            <div class="flex gap-1.5">
-                                <button onclick="editTanda('${t.id}')" class="p-1 text-slate-400 hover:text-slate-100" title="Editar">
+                            <div class="flex gap-2">
+                                <button onclick="editTanda('${t.id}')" class="p-1 text-slate-400 hover:text-slate-100 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
-                                <button onclick="deleteTanda('${t.id}')" class="p-1 text-slate-400 hover:text-red-400" title="Eliminar">
+                                <button onclick="triggerDeleteTanda('${t.id}')" class="p-1 text-slate-400 hover:text-red-500 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-850/50 mb-4">
-                            <span class="text-[10px] text-indigo-400 uppercase font-semibold block">Producto</span>
+                        <!-- Info Producto -->
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-850 mb-4">
+                            <span class="text-[10px] text-indigo-400 uppercase font-bold tracking-wider">Producto Cerrado</span>
                             <span class="text-sm font-semibold text-slate-200 block truncate">${t.productName}</span>
-                            <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-800 text-xs text-slate-400">
-                                <span><strong>${t.frequency}</strong></span>
-                                <span>Total: <strong class="text-emerald-400">${formatCurrency(t.totalAmount)}</strong></span>
+                            <div class="flex justify-between items-center mt-2.5 pt-2.5 border-t border-slate-800/80 text-xs text-slate-400">
+                                <span>Pagos: <strong>${t.frequency}</strong></span>
+                                <span>Total: <strong class="text-emerald-400 font-bold">${formatCurrency(t.totalAmount)}</strong></span>
                             </div>
                         </div>
 
-                        <div class="mb-4 space-y-1">
-                            <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-400">Progreso de Pago</span>
+                        <!-- Progreso -->
+                        <div class="mb-4 space-y-1.5">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-slate-400">Progreso de la Tanda</span>
                                 <span class="text-indigo-400">${porcentaje}% (${totalPagados}/${t.payments.length})</span>
                             </div>
-                            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-850">
-                                <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full transition-all" style="width: ${porcentaje}%"></div>
+                            <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                                <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full transition-all duration-300" style="width: ${porcentaje}%"></div>
                             </div>
-                            <div class="flex justify-between text-[11px] text-slate-500 pt-0.5">
+                            <div class="flex justify-between text-[11px] text-slate-500 font-medium">
                                 <span>Cobrado: ${formatCurrency(montoCobrado)}</span>
-                                <span>Resta: ${formatCurrency(t.totalAmount - montoCobrado)}</span>
+                                <span>Restan: ${formatCurrency(t.totalAmount - montoCobrado)}</span>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Cuadrícula interactiva -->
                     <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-semibold block mb-2">Presiona un abono para marcar/desmarcar:</span>
-                        <div class="flex flex-wrap gap-2">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-2">Cuadrícula de Abonos</span>
+                        <div class="flex flex-wrap gap-2.5">
                             ${paymentsGridHTML}
                         </div>
                     </div>
@@ -815,20 +631,10 @@
             });
         }
 
+        // --- RENDER DE CATÁLOGO ---
         function renderInventario() {
             const tableBody = document.getElementById('table-productos');
             tableBody.innerHTML = '';
-
-            if (state.products.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                            Cargando catálogo...
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
 
             state.products.forEach(p => {
                 const ganancia = p.price - p.cost;
@@ -837,30 +643,30 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-900/40 transition-colors";
                 tr.innerHTML = `
-                    <td class="px-6 py-4 font-semibold text-slate-200">
+                    <td class="px-6 py-4 font-bold text-slate-200">
                         ${p.name}
                     </td>
-                    <td class="px-6 py-4 text-slate-300">
+                    <td class="px-6 py-4 text-slate-400">
                         ${formatCurrency(p.cost)}
                     </td>
-                    <td class="px-6 py-4 text-emerald-400 font-semibold">
+                    <td class="px-6 py-4 text-emerald-400 font-bold">
                         ${formatCurrency(p.price)}
                     </td>
-                    <td class="px-6 py-4 text-violet-400">
-                        <div class="font-semibold">${formatCurrency(ganancia)}</div>
-                        <div class="text-[10px] text-slate-400">Margen: ${margen}%</div>
+                    <td class="px-6 py-4 text-violet-400 font-semibold">
+                        <div>${formatCurrency(ganancia)}</div>
+                        <div class="text-[10px] text-slate-500 font-normal">Margen: ${margen}%</div>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${p.stock > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
-                            ${p.stock} pzas
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${p.stock > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
+                            ${p.stock} piezas
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex gap-2 justify-end">
-                            <button onclick="editProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-slate-100">
+                            <button onclick="editProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-slate-100 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             </button>
-                            <button onclick="deleteProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-400">
+                            <button onclick="triggerDeleteProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
@@ -870,10 +676,48 @@
             });
         }
 
-        // --- MANEJO DE DROPDOWNS ---
+        // --- SISTEMA DE DIÁLOGO DE CONFIRMACIÓN SIN ALERTS DE NAVEGADOR ---
+        function triggerConfirm(text, onAccept) {
+            document.getElementById('confirm-modal-text').innerText = text;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+            onConfirmAction = onAccept;
+        }
+
+        function closeConfirmModal(accepted) {
+            document.getElementById('modal-confirm').classList.add('hidden');
+            if (accepted && onConfirmAction) {
+                onConfirmAction();
+            }
+            onConfirmAction = null;
+        }
+
+        function triggerDeleteTanda(id) {
+            triggerConfirm("¿Eliminar de forma definitiva esta tanda de clientes?", () => {
+                state.tandas = state.tandas.filter(t => t.id !== id);
+                saveLocalState();
+                renderDashboard();
+                renderTandas();
+                showToast("Tanda eliminada con éxito", "error");
+            });
+        }
+
+        function triggerDeleteProduct(id) {
+            const enUso = state.tandas.some(t => t.productId === id);
+            if (enUso) {
+                showToast("No se puede borrar, el producto está asignado a una tanda", "error");
+                return;
+            }
+            triggerConfirm("¿Borrar este producto de tu inventario?", () => {
+                state.products = state.products.filter(p => p.id !== id);
+                saveLocalState();
+                renderInventario();
+                showToast("Producto removido del catálogo", "error");
+            });
+        }
+
+        // --- MANEJO DE SELECCIÓN DE PRODUCTOS EN TANDAS ---
         function populateProductDropdown(selectedId = '') {
             const dropdown = document.getElementById('tanda-product');
-            if (!dropdown) return;
             dropdown.innerHTML = '';
             
             state.products.forEach(p => {
@@ -890,8 +734,6 @@
         function updateTandaProductAmount() {
             const dropdown = document.getElementById('tanda-product');
             const amountInput = document.getElementById('tanda-amount');
-            if (!dropdown || !amountInput) return;
-            
             const selectedId = dropdown.value;
             const product = state.products.find(p => p.id === selectedId);
             if (product) {
@@ -899,27 +741,101 @@
             }
         }
 
-        // Registrar cambios en el combo de productos
-        document.getElementById('tanda-product').addEventListener('change', updateTandaProductAmount);
-
-        // --- APERTURA DE MODALES ---
-        window.openTandaModal = function() {
+        // --- OPERACIONES: TANDAS (CREAR, EDITAR, ABONAR) ---
+        function openTandaModal() {
             document.getElementById('tanda-modal-title').innerText = "Registrar Nueva Tanda";
             document.getElementById('tanda-id').value = '';
-            document.getElementById('form-tanda').reset();
-            
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('tanda-date').value = hoy;
+            document.getElementById('tanda-client').value = '';
+            document.getElementById('tanda-phone').value = '';
+            document.getElementById('tanda-number').value = '';
+            document.getElementById('tanda-installments').value = '10';
+            document.getElementById('tanda-frequency').value = 'Semanal';
+            document.getElementById('tanda-date').value = new Date().toISOString().split('T')[0];
 
             populateProductDropdown();
             document.getElementById('modal-tanda').classList.remove('hidden');
-        };
+        }
 
-        window.closeTandaModal = function() {
+        function closeTandaModal() {
             document.getElementById('modal-tanda').classList.add('hidden');
-        };
+        }
 
-        window.editTanda = function(id) {
+        function saveTanda(event) {
+            event.preventDefault();
+            const id = document.getElementById('tanda-id').value;
+            const client = document.getElementById('tanda-client').value;
+            const phone = document.getElementById('tanda-phone').value;
+            const slotNumber = parseInt(document.getElementById('tanda-number').value) || null;
+            const productId = document.getElementById('tanda-product').value;
+            const amount = parseFloat(document.getElementById('tanda-amount').value);
+            const installments = parseInt(document.getElementById('tanda-installments').value);
+            const frequency = document.getElementById('tanda-frequency').value;
+            const date = document.getElementById('tanda-date').value;
+
+            const product = state.products.find(p => p.id === productId);
+            const productName = product ? product.name : "Producto Genérico";
+
+            if (id) {
+                // Editar existente
+                const tIdx = state.tandas.findIndex(t => t.id === id);
+                if (tIdx > -1) {
+                    const originalPayments = state.tandas[tIdx].payments;
+                    let newPayments = [...originalPayments];
+
+                    if (installments !== originalPayments.length) {
+                        if (installments > originalPayments.length) {
+                            newPayments = [...originalPayments, ...Array(installments - originalPayments.length).fill(false)];
+                        } else {
+                            newPayments = originalPayments.slice(0, installments);
+                        }
+                    }
+
+                    state.tandas[tIdx] = {
+                        ...state.tandas[tIdx],
+                        clientName: client,
+                        clientPhone: phone,
+                        productId,
+                        productName,
+                        totalAmount: amount,
+                        numInstallments: installments,
+                        frequency,
+                        startDate: date,
+                        slotNumber,
+                        payments: newPayments
+                    };
+                    showToast("Tanda editada con éxito");
+                }
+            } else {
+                // Nueva tanda
+                const nueva = {
+                    id: 't_' + Date.now(),
+                    clientName: client,
+                    clientPhone: phone,
+                    productId,
+                    productName,
+                    totalAmount: amount,
+                    numInstallments: installments,
+                    frequency,
+                    startDate: date,
+                    slotNumber,
+                    payments: Array(installments).fill(false)
+                };
+                state.tandas.push(nueva);
+
+                // Descontar una unidad del stock del producto automáticamente
+                if (product && product.stock > 0) {
+                    product.stock -= 1;
+                }
+                showToast("¡Tanda guardada y stock descontado!");
+            }
+
+            saveLocalState();
+            closeTandaModal();
+            renderDashboard();
+            renderTandas();
+        }
+
+        function editTanda(id) {
             const t = state.tandas.find(t => t.id === id);
             if (!t) return;
 
@@ -935,21 +851,75 @@
 
             populateProductDropdown(t.productId);
             document.getElementById('modal-tanda').classList.remove('hidden');
-        };
+        }
 
-        window.openProductModal = function() {
+        function togglePaymentState(tandaId, index) {
+            const t = state.tandas.find(t => t.id === tandaId);
+            if (t) {
+                t.payments[index] = !t.payments[index];
+                saveLocalState();
+                renderDashboard();
+                renderTandas();
+                showToast("Pago registrado para el cliente");
+            }
+        }
+
+        function abonaTandaRapido(tandaId, index) {
+            const t = state.tandas.find(t => t.id === tandaId);
+            if (t) {
+                t.payments[index] = true;
+                saveLocalState();
+                renderDashboard();
+                renderTandas();
+                showToast(`¡Abono ${index + 1} de $${(t.totalAmount / t.numInstallments).toFixed(0)} cobrado!`);
+            }
+        }
+
+        // --- OPERACIONES: CATÁLOGO DE PRODUCTOS Cerrados ---
+        function openProductModal() {
             document.getElementById('product-modal-title').innerText = "Registrar Producto";
             document.getElementById('product-id').value = '';
-            document.getElementById('form-product').reset();
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-cost').value = '';
+            document.getElementById('product-price').value = '';
             document.getElementById('product-stock').value = '1';
             document.getElementById('modal-product').classList.remove('hidden');
-        };
+        }
 
-        window.closeProductModal = function() {
+        function closeProductModal() {
             document.getElementById('modal-product').classList.add('hidden');
-        };
+        }
 
-        window.editProduct = function(id) {
+        function saveProduct(event) {
+            event.preventDefault();
+            const id = document.getElementById('product-id').value;
+            const name = document.getElementById('product-name').value;
+            const cost = parseFloat(document.getElementById('product-cost').value);
+            const price = parseFloat(document.getElementById('product-price').value);
+            const stock = parseInt(document.getElementById('product-stock').value);
+
+            if (id) {
+                const idx = state.products.findIndex(p => p.id === id);
+                if (idx > -1) {
+                    state.products[idx] = { id, name, cost, price, stock };
+                    showToast("Producto modificado");
+                }
+            } else {
+                const nuevo = {
+                    id: 'p_' + Date.now(),
+                    name, cost, price, stock
+                };
+                state.products.push(nuevo);
+                showToast("Producto añadido al catálogo");
+            }
+
+            saveLocalState();
+            closeProductModal();
+            renderInventario();
+            renderDashboard();
+        }
+
+        function editProduct(id) {
             const p = state.products.find(p => p.id === id);
             if (!p) return;
 
@@ -960,30 +930,145 @@
             document.getElementById('product-price').value = p.price;
             document.getElementById('product-stock').value = p.stock;
             document.getElementById('modal-product').classList.remove('hidden');
-        };
-
-        // --- SISTEMA DE TOASTS ---
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const bgColor = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
-            const icon = type === 'success' 
-                ? `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
-                : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-
-            toast.className = `flex items-center gap-3 ${bgColor} text-white text-sm font-medium py-3 px-4 rounded-xl shadow-xl pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
-            toast.innerHTML = `${icon}<span>${message}</span>`;
-
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => { toast.remove(); }, 300);
-            }, 4000);
         }
 
-        // --- UTILERIAS ---
+        // --- SISTEMA DE SINCRONIZACIÓN AUTOMÁTICA EN TIEMPO REAL ---
+        function openSyncModal() {
+            document.getElementById('sync-code-input').value = syncCode;
+            actualizarUIModalSync();
+            document.getElementById('modal-sync').classList.remove('hidden');
+        }
+
+        function closeSyncModal() {
+            document.getElementById('modal-sync').classList.add('hidden');
+        }
+
+        function actualizarUIModalSync() {
+            const modalDot = document.getElementById('modal-sync-dot');
+            const modalText = document.getElementById('modal-sync-status-text');
+            const btnDesc = document.getElementById('btn-desconectar');
+
+            if (syncCode) {
+                modalDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                modalText.innerText = `Sincronizado con el código secreto: ${syncCode}`;
+                btnDesc.classList.remove('hidden');
+            } else {
+                modalDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+                modalText.innerText = "Guardando solo en memoria local. (Tus dispositivos no se sincronizan)";
+                btnDesc.classList.add('hidden');
+            }
+        }
+
+        function actualizarBadgeSync() {
+            const dot = document.getElementById('sync-dot');
+            const text = document.getElementById('sync-text');
+            const badge = document.getElementById('sync-badge');
+
+            if (syncCode) {
+                dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+                text.innerText = `Nube Activa: ${syncCode}`;
+                badge.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer";
+            } else {
+                dot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
+                text.innerText = "Solo Local (Toca para conectar)";
+                badge.className = "inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer";
+            }
+        }
+
+        async function conectarNube() {
+            const inputVal = document.getElementById('sync-code-input').value.trim();
+            if (!inputVal) {
+                showToast("Por favor escribe un código para conectar", "error");
+                return;
+            }
+
+            syncCode = inputVal;
+            localStorage.setItem('tanda_sync_code', syncCode);
+            showToast("Conectando con la nube...");
+
+            // Intentar descargar de forma segura los datos existentes en esa llave
+            const datosNube = await bajarDatosDeLaNube(syncCode);
+            if (datosNube) {
+                state = datosNube;
+                localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                showToast("¡Datos sincronizados exitosamente con tu esposa!");
+            } else {
+                // Si la nube está vacía para esta clave, subimos lo que tenemos en local
+                await subirCambiosALaNube();
+                showToast("Nuevo código secreto creado en la nube");
+            }
+
+            actualizarUIModalSync();
+            actualizarBadgeSync();
+            closeSyncModal();
+            
+            renderDashboard();
+            renderTandas();
+            renderInventario();
+
+            iniciarAutoSync();
+        }
+
+        function desconectarNube() {
+            syncCode = "";
+            localStorage.removeItem('tanda_sync_code');
+            if (syncInterval) clearInterval(syncInterval);
+
+            showToast("Sincronización desactivada", "error");
+            actualizarUIModalSync();
+            actualizarBadgeSync();
+            closeSyncModal();
+        }
+
+        // Motor REST ultraligero y gratis para sincronización de datos
+        async function subirCambiosALaNube() {
+            if (!syncCode) return;
+            try {
+                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/${BUCKET_NAME}_${syncCode}`;
+                await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(state)
+                });
+            } catch (e) {
+                console.error("Error al subir:", e);
+            }
+        }
+
+        async function bajarDatosDeLaNube(code) {
+            try {
+                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/${BUCKET_NAME}_${code}`;
+                const res = await fetch(url);
+                if (res.status === 200) {
+                    return await res.json();
+                }
+            } catch (e) {
+                console.error("Error al bajar datos:", e);
+            }
+            return null;
+        }
+
+        function iniciarAutoSync() {
+            if (syncInterval) clearInterval(syncInterval);
+            if (!syncCode) return;
+
+            // Revisar actualizaciones cada 15 segundos de forma silenciosa
+            syncInterval = setInterval(async () => {
+                const datos = await bajarDatosDeLaNube(syncCode);
+                if (datos) {
+                    // Evitar reemplazar el estado si no hay cambios reales
+                    if (JSON.stringify(datos) !== JSON.stringify(state)) {
+                        state = datos;
+                        localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                        renderDashboard();
+                        renderTandas();
+                        renderInventario();
+                        showToast("¡Nube actualizada!");
+                    }
+                }
+            }, 15000);
+        }
+
+        // --- UTILERÍAS ---
         function formatCurrency(value) {
             return new Intl.NumberFormat('es-MX', {
                 style: 'currency',
@@ -991,8 +1076,38 @@
             }).format(value);
         }
 
-        // Carga inicial estática por si tarda la conexión
-        renderDashboard();
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-indigo-600' : 'bg-red-600';
+            const icon = type === 'success' 
+                ? `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
+                : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+
+            toast.className = `flex items-center gap-3 ${bgColor} text-white text-xs font-bold py-3.5 px-5 rounded-2xl shadow-xl pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4500);
+        }
+
+        // --- CARGA INICIAL AL CARGAR LA PÁGINA ---
+        window.onload = function() {
+            actualizarBadgeSync();
+            renderDashboard();
+            renderTandas();
+            renderInventario();
+
+            // Iniciar sincronización en la nube automática si ya existía una clave
+            if (syncCode) {
+                iniciarAutoSync();
+            }
+        };
     </script>
 </body>
 </html>
