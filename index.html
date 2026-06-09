@@ -3,82 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TandaManager Pro</title>
+    <title>TandaManager Pro Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 font-sans p-4">
-    <div class="max-w-md mx-auto space-y-6">
-        <header class="border-b border-slate-800 pb-4">
-            <h1 class="text-xl font-bold text-indigo-400 uppercase tracking-tighter">TandaManager Pro</h1>
-            <p class="text-[10px] text-slate-500">Gestión Profesional - Ricardo Edition</p>
-        </header>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        <nav class="flex gap-2 bg-slate-900 p-1 rounded-xl">
-            <button onclick="tab('tandas')" class="flex-1 py-2 rounded-lg text-xs font-bold bg-slate-800" id="btn-tandas">Tandas</button>
-            <button onclick="tab('catalogo')" class="flex-1 py-2 rounded-lg text-xs font-bold" id="btn-catalogo">Catálogo</button>
-        </nav>
+        const firebaseConfig = JSON.parse('__firebase_config');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tanda-pro-cloud';
 
-        <div id="vista" class="space-y-4"></div>
-    </div>
+        let dbState = { tandas: [], productos: [] };
 
-    <script>
-        let db = JSON.parse(localStorage.getItem('tanda_db')) || { tandas: [], productos: [] };
-        function save() { localStorage.setItem('tanda_db', JSON.stringify(db)); render(); }
+        async function save() {
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'db'), dbState);
+        }
 
-        function tab(v) {
-            document.getElementById('btn-tandas').className = `flex-1 py-2 rounded-lg text-xs font-bold ${v==='tandas'?'bg-indigo-600':'bg-slate-800'}`;
-            document.getElementById('btn-catalogo').className = `flex-1 py-2 rounded-lg text-xs font-bold ${v==='catalogo'?'bg-indigo-600':'bg-slate-800'}`;
-            
-            const el = document.getElementById('vista');
-            if (v === 'catalogo') {
-                el.innerHTML = `<div class="space-y-2">${db.productos.map((p, i) => `
-                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
-                        <div><p class="font-bold">${p.nombre}</p><p class="text-[10px] text-slate-400">$${p.precio}</p></div>
-                        <button onclick="db.productos.splice(${i},1); save();" class="text-red-500 text-xs">✕</button>
-                    </div>`).join('')}</div>
-                    <button onclick="addProd()" class="w-full bg-slate-800 p-3 rounded-xl text-xs font-bold">+ Nuevo Producto</button>`;
-            } else {
-                el.innerHTML = `<div class="space-y-4">${db.tandas.map((t, i) => {
-                    const pagado = t.pagos.filter(x => x).length * (t.monto/t.semanas);
-                    return `
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
-                        <div class="flex justify-between">
-                            <p class="font-bold">${t.cliente}</p>
-                            <p class="text-xs text-indigo-400">$${pagado} / $${t.monto}</p>
+        signInAnonymously(auth).then(() => {
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'db'), (snap) => {
+                if (snap.exists()) {
+                    dbState = snap.data();
+                    render();
+                }
+            });
+        });
+
+        window.render = () => {
+            const v = document.getElementById('vista');
+            v.innerHTML = `
+                <div class="space-y-4">
+                    <h2 class="text-indigo-400 font-bold border-b border-slate-800 pb-2">Tandas Activas</h2>
+                    ${dbState.tandas.map((t, i) => `
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between">
+                                <p class="font-bold">${t.cliente}</p>
+                                <p class="text-xs text-emerald-400">$${t.pagos.filter(p => p).length * (t.monto/t.semanas)} / $${t.monto}</p>
+                            </div>
+                            <div class="flex flex-wrap gap-1 mt-2">
+                                ${t.pagos.map((p, pi) => `<button onclick="marcar(${i}, ${pi})" class="w-6 h-6 rounded ${p?'bg-emerald-600':'bg-slate-700'} text-[9px]">${pi+1}</button>`).join('')}
+                            </div>
                         </div>
-                        <div class="flex flex-wrap gap-1">${t.pagos.map((p, pi) => `<button onclick="db.tandas[${i}].pagos[${pi}]=!db.tandas[${i}].pagos[${pi}]; save();" class="w-6 h-6 rounded ${p?'bg-emerald-600':'bg-slate-700'} text-[9px]">${pi+1}</button>`).join('')}</div>
-                        <button onclick="db.tandas.splice(${i},1); save();" class="text-[9px] text-red-500">Eliminar Tanda</button>
-                    </div>`;
-                }).join('')}</div>
-                <button onclick="addTanda()" class="w-full bg-indigo-600 p-3 rounded-xl text-xs font-bold">+ Registrar Tanda</button>`;
-            }
-        }
+                    `).join('')}
+                    <button onclick="nuevaTanda()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold text-sm">+ Nueva Tanda</button>
+                    
+                    <h2 class="text-slate-400 font-bold border-b border-slate-800 pb-2 pt-4">Catálogo</h2>
+                    ${dbState.productos.map((p, i) => `<div class="bg-slate-900 p-3 rounded-lg flex justify-between text-xs"><span>${p.nombre}</span><span>$${p.precio}</span></div>`).join('')}
+                    <button onclick="nuevoProd()" class="w-full bg-slate-800 py-3 rounded-xl font-bold text-sm">+ Agregar Producto</button>
+                </div>
+            `;
+        };
 
-        function addProd() {
-            let nombre = prompt("Producto:");
+        window.marcar = (t, p) => { dbState.tandas[t].pagos[p] = !dbState.tandas[t].pagos[p]; save(); };
+        window.nuevoProd = () => {
+            let nombre = prompt("Nombre:");
             let precio = parseFloat(prompt("Precio:"));
-            if(nombre && precio) { db.productos.push({nombre, precio}); save(); }
-        }
-
-        function addTanda() {
-            if(db.productos.length === 0) return alert("Agrega productos primero");
-            let cliente = prompt("Nombre del cliente:");
-            let numSemanas = parseInt(prompt("Número de semanas:"));
-            let prodNames = db.productos.map(p => p.nombre).join(', ');
-            let totalMonto = 0;
-            let sel = [];
+            if(nombre && precio) { dbState.productos.push({nombre, precio}); save(); }
+        };
+        window.nuevaTanda = () => {
+            let cliente = prompt("Nombre cliente:");
+            let numSemanas = parseInt(prompt("Semanas:"));
+            let total = 0;
             while(confirm("¿Agregar producto?")){
-                let pName = prompt("Nombre del producto ("+prodNames+"):");
-                let p = db.productos.find(x => x.nombre === pName);
-                if(p) { totalMonto += p.precio; sel.push(p.nombre); }
+                let p = prompt("Nombre:");
+                let item = dbState.productos.find(x => x.nombre === p);
+                if(item) total += item.precio;
             }
-            if(cliente && totalMonto > 0) {
-                db.tandas.push({cliente, monto: totalMonto, semanas: numSemanas, pagos: Array(numSemanas).fill(false)});
+            if(cliente && total > 0) {
+                dbState.tandas.push({cliente, monto: total, semanas: numSemanas, pagos: Array(numSemanas).fill(false)});
                 save();
             }
-        }
-        function render() { tab(document.querySelector('.bg-indigo-600').id === 'btn-tandas' ? 'tandas' : 'catalogo'); }
-        tab('tandas');
+        };
     </script>
+</head>
+<body class="bg-slate-950 text-white p-4">
+    <div class="max-w-md mx-auto">
+        <header class="mb-6"><h1 class="text-2xl font-bold text-indigo-400">TandaManager Cloud</h1></header>
+        <div id="vista">Cargando sincronización...</div>
+    </div>
 </body>
 </html>
