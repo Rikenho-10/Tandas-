@@ -24,7 +24,7 @@
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg">
-                    <span class="text-xl">⚡</span>
+                    <span class="text-xl">🎸</span>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold text-white">TandaManager Pro</h1>
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                     <button onclick="openSyncModal()" class="text-xs text-indigo-400 font-bold hover:underline py-2 border-t border-slate-800 text-center block w-full">
-                        💬 Compartir app con mi esposa
+                        📲 Sincronizar con mi esposa
                     </button>
                 </div>
             </div>
@@ -148,21 +148,33 @@
     <div id="modal-sync" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="font-bold text-white text-sm">Sincronizar Galaxy y Redmi</h3>
+                <h3 class="font-bold text-white text-sm">Compartir con mi Esposa</h3>
                 <button onclick="closeSyncModal()" class="text-slate-400">✕</button>
             </div>
-            <p class="text-xs text-slate-400">Inventen una contraseña e ingresen exactamente la misma en ambos celulares.</p>
-            <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-850 rounded-lg p-2.5 text-xs text-white" placeholder="Ej: tanda-ricardo-y-esposa">
             
-            <div class="bg-indigo-950/20 rounded-xl border border-indigo-900/30 p-3">
-                <span class="text-[10px] text-indigo-400 font-bold block">ESTADO DE CONEXIÓN:</span>
-                <span id="modal-sync-status-text" class="text-xs text-slate-300 font-bold mt-1 block">Guardando solo en este teléfono</span>
+            <!-- OPCCIÓN A: NUBE -->
+            <div class="space-y-2">
+                <span class="text-[10px] text-slate-400 font-bold block uppercase">OPCIÓN 1: Sincronización Automática</span>
+                <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs text-white" placeholder="Contraseña secreta (ej: tandem-familia)">
+                <button onclick="conectarNube()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-bold">Activar Nube</button>
             </div>
 
-            <div class="space-y-2">
-                <button onclick="conectarNube()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-bold">Sincronizar Celular</button>
-                <button onclick="compartirPorWhatsApp()" id="btn-whatsapp" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold hidden">💬 Mandar enlace a mi esposa</button>
-                <button onclick="desconectarNube()" id="btn-desconectar" class="w-full bg-slate-800 text-slate-300 py-2 rounded-lg text-xs font-bold hidden">Desconectar Sincronización</button>
+            <!-- OPCIÓN B: COPIA DIRECTA WHATSAPP -->
+            <div class="space-y-2 border-t border-slate-800 pt-3">
+                <span class="text-[10px] text-emerald-400 font-bold block uppercase">OPCIÓN 2: Copia por WhatsApp (Infallible)</span>
+                <p class="text-[10px] text-slate-400">Si el internet falla, mándale tus datos directo por mensaje para que ella los pegue.</p>
+                <div class="flex gap-2">
+                    <button onclick="copiarRespaldoManual()" class="flex-1 bg-slate-800 text-slate-200 py-1.5 rounded-lg text-xs font-bold">Copiar mis datos</button>
+                    <button onclick="importarRespaldoManual()" class="flex-1 bg-slate-800 text-indigo-400 py-1.5 rounded-lg text-xs font-bold">Pegar datos de Ricardo</button>
+                </div>
+            </div>
+            
+            <div class="bg-indigo-950/20 rounded-xl border border-indigo-900/30 p-2.5 text-center">
+                <span id="modal-sync-status-text" class="text-xs text-slate-300 font-bold block">Guardando solo en este teléfono</span>
+            </div>
+
+            <div class="pt-2 text-center">
+                <button onclick="desconectarNube()" id="btn-desconectar" class="text-xs text-red-400 hover:underline hidden">Apagar Sincronización</button>
             </div>
         </div>
     </div>
@@ -194,8 +206,8 @@
                 <!-- PRODUCTOS MÚLTIPLES -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold">Productos de esta Tanda</label>
-                        <button type="button" onclick="addProductRow()" class="text-[9px] bg-slate-800 text-indigo-400 font-bold px-2 py-0.5 rounded border border-slate-700">+ Añadir otro</button>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">Productos Pedidos</label>
+                        <button type="button" onclick="addProductRow()" class="text-[9px] bg-slate-850 text-indigo-400 font-bold px-2 py-0.5 rounded border border-slate-700">+ Añadir otro</button>
                     </div>
                     <div id="tanda-products-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
                 </div>
@@ -281,7 +293,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE LA APP (A PRUEBA DE FALLOS) -->
+    <!-- LÓGICA DE LA APP (PURA, ESTABLE Y RESISTENTE) -->
     <script>
         const BUCKET = "ricardo_t_rel_2026";
         let syncCode = localStorage.getItem('tanda_sync_code') || "";
@@ -469,7 +481,7 @@
                             <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full" style="width: ${porcentaje}%"></div>
                         </div>
                         <div class="flex justify-between pt-1 font-medium">
-                            <span class="text-slate-400">Lleva: <strong class="text-emerald-400 font-bold">${formatCurrency(cobrado)}</strong></span>
+                            <span class="text-slate-400">Lleva pagado: <strong class="text-emerald-400 font-bold">${formatCurrency(cobrado)}</strong></span>
                             <span class="text-slate-400">Resta: <strong class="text-amber-500 font-bold">${formatCurrency(resta)}</strong></span>
                         </div>
                     </div>
@@ -716,7 +728,7 @@
             document.getElementById('modal-product').classList.remove('hidden');
         };
 
-        // --- DIALOGOS ---
+        // --- DIALOGOS CONFIRMACIÓN ---
         function triggerConfirm(text, onAccept) {
             document.getElementById('confirm-modal-text').innerText = text;
             document.getElementById('modal-confirm').classList.remove('hidden');
@@ -750,7 +762,7 @@
             });
         };
 
-        // --- SISTEMA DE ENLACE INTELIGENTE Y SINCRONIZACIÓN SEGUNDA GENERACIÓN (REDMI Y GALAXY) ---
+        // --- ENLACE INTELIGENTE Y EXTREMO (SISTEMA DE SINCRONIZACIÓN) ---
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -767,21 +779,15 @@
         function closeSyncModal() { document.getElementById('modal-sync').classList.add('hidden'); }
 
         function actualizarUIModalSync() {
-            const dot = document.getElementById('modal-sync-dot');
             const txt = document.getElementById('modal-sync-status-text');
             const btnDesc = document.getElementById('btn-desconectar');
-            const btnWA = document.getElementById('btn-whatsapp');
 
             if (syncCode) {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                txt.innerText = `Enlazado: ${syncCode}`;
+                txt.innerText = `Sincronización activa con: ${syncCode}`;
                 btnDesc.classList.remove('hidden');
-                btnWA.classList.remove('hidden');
             } else {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-                txt.innerText = "Guardando solo localmente (Celulares desconectados)";
+                txt.innerText = "Guardando solo en este teléfono";
                 btnDesc.classList.add('hidden');
-                btnWA.classList.add('hidden');
             }
         }
 
@@ -793,11 +799,11 @@
 
             if (syncCode) {
                 dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
-                text.innerText = `Nube Activa: ${syncCode}`;
+                text.innerText = `Conectado: ${syncCode}`;
                 badge.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-bold cursor-pointer";
                 btnSync.classList.remove('hidden');
             } else {
-                dot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
+                dot.className = "w-1.5 h-1.5 rounded-full bg-red-500";
                 text.innerText = "Solo Local (Toca para conectar)";
                 badge.className = "inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-bold cursor-pointer";
                 btnSync.classList.add('hidden');
@@ -806,30 +812,31 @@
 
         window.conectarNube = async function() {
             const inputVal = document.getElementById('sync-code-input').value.trim();
-            if (!inputVal) { showToast("Escribe un código familiar", "error"); return; }
+            if (!inputVal) { showToast("Escribe una contraseña", "error"); return; }
 
-            syncCode = inputVal;
-            localStorage.setItem('tanda_sync_code', syncCode);
-            showToast("Buscando datos compartidos...");
+            showToast("Buscando tus datos en la nube...");
 
-            const datosNube = await bajarDatosDeLaNube(syncCode);
+            // ESCUDO ANTIBORRADO: Descargar PRIMERO antes de subir
+            const datosNube = await bajarDatosDeLaNube(inputVal);
 
-            // ESCUDO DE PROTECCIÓN DE DATOS:
-            // Si la nube está vacía pero mi celular ya tiene información valiosa, subirla de inmediato
-            if (!datosNube || (datosNube.tandas.length === 0 && state.tandas.length > 0)) {
-                await subirCambiosALaNube();
-                showToast("Datos locales subidos a la nube con éxito");
-            } else if (datosNube) {
-                // Si la nube tiene más tandas, adoptamos la nube
+            if (datosNube && datosNube.tandas && datosNube.tandas.length > 0) {
+                // Si ya existen datos guardados en la nube, el celular que se conecta los descarga
                 state = datosNube;
                 localStorage.setItem('tanda_local_state', JSON.stringify(state));
-                showToast("¡Celulares sincronizados correctamente!");
+                syncCode = inputVal;
+                localStorage.setItem('tanda_sync_code', syncCode);
+                showToast("¡Datos de Ricardo descargados con éxito!");
+            } else {
+                // Si la nube está vacía (primera vez), subimos el estado que tiene Ricardo
+                syncCode = inputVal;
+                localStorage.setItem('tanda_sync_code', syncCode);
+                await subirCambiosALaNube();
+                showToast("Contraseña creada y datos locales respaldados en la nube");
             }
 
             actualizarUIModalSync();
             actualizarBadgeSync();
             closeSyncModal();
-            
             renderDashboard();
             renderTandas();
             renderInventario();
@@ -847,13 +854,6 @@
             renderDashboard();
             renderTandas();
             renderInventario();
-        };
-
-        window.compartirPorWhatsApp = function() {
-            const urlBase = window.location.origin + window.location.pathname;
-            const enlaceCompleto = `${urlBase}?sync=${encodeURIComponent(syncCode)}`;
-            const mensaje = encodeURIComponent(`Hola mi amor, abre este enlace para conectarte automáticamente a nuestro control de tandas compartido: ${enlaceCompleto}`);
-            window.open(`https://api.whatsapp.com/send?text=${mensaje}`);
         };
 
         window.forzarSincronizacionManual = async function() {
@@ -891,7 +891,7 @@
         async function bajarDatosDeLaNube(code) {
             try {
                 const hash = await sha256(code);
-                // Cache buster extremo para evitar que el Redmi y el Galaxy guarden historial viejo
+                // Cache buster para forzar descarga limpia
                 const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/tanda_${hash}?cb=${Date.now()}`;
                 const res = await fetch(url, {
                     method: 'GET',
@@ -928,31 +928,72 @@
             }, 10000);
         }
 
+        // --- SISTEMA RESPALDO EXTREMO DIRECTO POR TEXTO (SIN INTERNET/NUBE) ---
+        window.copiarRespaldoManual = function() {
+            try {
+                const strData = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+                const dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                dummy.value = strData;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+                showToast("¡Texto de respaldo copiado! Mándaselo por WhatsApp");
+            } catch (err) {
+                showToast("Error al copiar datos", "error");
+            }
+        };
+
+        window.importarRespaldoManual = function() {
+            const raw = prompt("Pega el texto de respaldo que te mandó Ricardo por WhatsApp:");
+            if (!raw) return;
+            try {
+                const parsed = JSON.parse(decodeURIComponent(escape(atob(raw.trim()))));
+                if (parsed && parsed.tandas && parsed.products) {
+                    state = parsed;
+                    localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                    renderDashboard();
+                    renderTandas();
+                    renderInventario();
+                    showToast("¡Datos de Ricardo importados correctamente!");
+                    closeSyncModal();
+                } else {
+                    showToast("El código no es válido", "error");
+                }
+            } catch (err) {
+                showToast("Código incorrecto o dañado", "error");
+            }
+        };
+
         function formatCurrency(v) {
             return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
         }
 
-        // --- CARGA INICIAL Y ENLACE AUTOMÁTICO ---
-        window.onload = async function() {
-            // Leer enlace mágico si viene desde WhatsApp (?sync=codigo)
-            const params = new URLSearchParams(window.location.search);
-            const syncParam = params.get('sync');
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
             
-            if (syncParam) {
-                syncCode = decodeURIComponent(syncParam);
-                localStorage.setItem('tanda_sync_code', syncCode);
-                // Limpiar la barra del navegador para estética
-                window.history.replaceState({}, document.title, window.location.pathname);
-                showToast("¡Enlace mágico cargado!");
-            }
+            const bgColor = type === 'success' ? 'bg-indigo-600' : 'bg-red-600';
+            toast.className = `flex items-center gap-3 ${bgColor} text-white text-xs font-bold py-3 px-5 rounded-xl shadow-xl transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<span>${message}</span>`;
 
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        // --- CARGA INICIAL ---
+        window.onload = async function() {
             actualizarBadgeSync();
             renderDashboard();
             renderTandas();
             renderInventario();
 
             if (syncCode) {
-                // Al entrar, cargar datos de forma segura
+                // Al abrir, primero actualizamos con lo último de la nube
                 const datos = await bajarDatosDeLaNube(syncCode);
                 if (datos) {
                     state = datos;
