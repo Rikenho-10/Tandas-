@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TandaManager Pro Cloud</title>
+    <title>TandaManager Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = JSON.parse('__firebase_config');
@@ -16,72 +16,62 @@
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'tanda-pro-cloud';
 
-        let dbState = { tandas: [], productos: [] };
+        let state = { tandas: [], productos: [] };
 
-        async function save() {
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'db'), dbState);
+        async function updateCloud() {
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'db'), state);
         }
 
         signInAnonymously(auth).then(() => {
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'db'), (snap) => {
                 if (snap.exists()) {
-                    dbState = snap.data();
+                    state = snap.data();
+                    render();
+                } else {
                     render();
                 }
             });
         });
 
         window.render = () => {
-            const v = document.getElementById('vista');
-            v.innerHTML = `
-                <div class="space-y-4">
+            document.getElementById('app').innerHTML = `
+                <div class="space-y-6">
                     <h2 class="text-indigo-400 font-bold border-b border-slate-800 pb-2">Tandas Activas</h2>
-                    ${dbState.tandas.map((t, i) => `
-                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                            <div class="flex justify-between">
-                                <p class="font-bold">${t.cliente}</p>
-                                <p class="text-xs text-emerald-400">$${t.pagos.filter(p => p).length * (t.monto/t.semanas)} / $${t.monto}</p>
+                    ${state.tandas.map((t, i) => `
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                            <div class="flex justify-between mb-2">
+                                <p class="font-bold text-sm">${t.cliente}</p>
+                                <p class="text-xs text-emerald-400">$${t.pagos.filter(p=>p).length * (t.monto/t.semanas)} / $${t.monto}</p>
                             </div>
-                            <div class="flex flex-wrap gap-1 mt-2">
-                                ${t.pagos.map((p, pi) => `<button onclick="marcar(${i}, ${pi})" class="w-6 h-6 rounded ${p?'bg-emerald-600':'bg-slate-700'} text-[9px]">${pi+1}</button>`).join('')}
+                            <div class="flex flex-wrap gap-1">
+                                ${t.pagos.map((p, pi) => `<button onclick="marcar(${i}, ${pi})" class="w-7 h-7 rounded ${p?'bg-emerald-600':'bg-slate-700'} text-[10px]">${pi+1}</button>`).join('')}
                             </div>
                         </div>
                     `).join('')}
-                    <button onclick="nuevaTanda()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold text-sm">+ Nueva Tanda</button>
-                    
-                    <h2 class="text-slate-400 font-bold border-b border-slate-800 pb-2 pt-4">Catálogo</h2>
-                    ${dbState.productos.map((p, i) => `<div class="bg-slate-900 p-3 rounded-lg flex justify-between text-xs"><span>${p.nombre}</span><span>$${p.precio}</span></div>`).join('')}
-                    <button onclick="nuevoProd()" class="w-full bg-slate-800 py-3 rounded-xl font-bold text-sm">+ Agregar Producto</button>
+                    <button onclick="nuevaTanda()" class="w-full bg-indigo-600 py-3 rounded-lg font-bold text-xs">+ Nueva Tanda</button>
                 </div>
             `;
         };
 
-        window.marcar = (t, p) => { dbState.tandas[t].pagos[p] = !dbState.tandas[t].pagos[p]; save(); };
-        window.nuevoProd = () => {
-            let nombre = prompt("Nombre:");
-            let precio = parseFloat(prompt("Precio:"));
-            if(nombre && precio) { dbState.productos.push({nombre, precio}); save(); }
+        window.marcar = (tIdx, pIdx) => {
+            state.tandas[tIdx].pagos[pIdx] = !state.tandas[tIdx].pagos[pIdx];
+            updateCloud();
         };
+
         window.nuevaTanda = () => {
-            let cliente = prompt("Nombre cliente:");
-            let numSemanas = parseInt(prompt("Semanas:"));
-            let total = 0;
-            while(confirm("¿Agregar producto?")){
-                let p = prompt("Nombre:");
-                let item = dbState.productos.find(x => x.nombre === p);
-                if(item) total += item.precio;
-            }
-            if(cliente && total > 0) {
-                dbState.tandas.push({cliente, monto: total, semanas: numSemanas, pagos: Array(numSemanas).fill(false)});
-                save();
+            let cliente = prompt("Nombre del cliente:");
+            let monto = parseFloat(prompt("Monto total:"));
+            let semanas = parseInt(prompt("Número de semanas:"));
+            if(cliente && monto && semanas) {
+                state.tandas.push({cliente, monto, semanas, pagos: Array(semanas).fill(false)});
+                updateCloud();
             }
         };
     </script>
 </head>
 <body class="bg-slate-950 text-white p-4">
-    <div class="max-w-md mx-auto">
-        <header class="mb-6"><h1 class="text-2xl font-bold text-indigo-400">TandaManager Cloud</h1></header>
-        <div id="vista">Cargando sincronización...</div>
+    <div id="app" class="max-w-md mx-auto">
+        <p class="text-slate-500">Conectando a la base de datos...</p>
     </div>
 </body>
 </html>
