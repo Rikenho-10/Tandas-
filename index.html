@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TandaManager Pro | Sincronización Real</title>
-    <!-- Tailwind CSS para diseño moderno -->
+    <title>TandaManager Pro</title>
+    <!-- Tailwind CSS para diseño moderno y oscuro -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -35,7 +35,7 @@
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg">
-                    <!-- Icono Rayo Rockero -->
+                    <!-- Icono Rayo Guns N Roses style -->
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
@@ -43,15 +43,19 @@
                 <div>
                     <h1 class="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">TandaManager Pro</h1>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <span id="sync-badge" class="inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer" onclick="openSyncModal()">
+                        <span id="sync-badge" class="inline-flex items-center gap-1.5 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer" onclick="openSyncModal()">
                             <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="sync-dot"></span>
-                            <span id="sync-text">Solo Local (Toca para conectar)</span>
+                            <span id="sync-text">Solo Local (Conectar Celulares)</span>
                         </span>
+                        <!-- Botón para forzar actualización inmediata -->
+                        <button onclick="forzarSincronizacionManual()" id="btn-sync-now" class="hidden text-[10px] bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white px-2 py-0.5 rounded font-bold transition-all">
+                            🔄 Sincronizar ya
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Menú de Navegación principal -->
+            <!-- Menú de Navegación -->
             <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
                     Tablero
@@ -74,40 +78,41 @@
 
         <!-- ================= TABLERO (DASHBOARD) ================= -->
         <section id="tab-dashboard" class="space-y-6">
+            <!-- Métricas -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
                     <p class="text-sm text-slate-400 font-medium">Total de Ventas</p>
                     <p class="text-2xl font-bold mt-1 text-slate-100" id="stat-total-ventas">$0.00</p>
-                    <div class="text-xs text-indigo-400 mt-2 font-semibold">Valor de mercancía colocada</div>
+                    <div class="text-xs text-indigo-400 mt-2 font-semibold">Valor total de tanda colocada</div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
                     <p class="text-sm text-slate-400 font-medium">Total Cobrado</p>
                     <p class="text-2xl font-bold mt-1 text-emerald-400" id="stat-total-cobrado">$0.00</p>
-                    <div class="text-xs text-emerald-500 mt-2 font-semibold flex items-center gap-1">
+                    <div class="text-xs text-emerald-500 mt-2 font-semibold">
                         <span id="stat-cobrado-porcentaje">0%</span> cobrado en total
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
                     <p class="text-sm text-slate-400 font-medium">Pendiente por Cobrar</p>
                     <p class="text-2xl font-bold mt-1 text-amber-400" id="stat-total-pendiente">$0.00</p>
-                    <div class="text-xs text-amber-500 mt-2 font-semibold">Dinero activo en tandas</div>
+                    <div class="text-xs text-amber-500 mt-2 font-semibold">Dinero activo en la calle</div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
                     <p class="text-sm text-slate-400 font-medium">Ganancia Estimada</p>
                     <p class="text-2xl font-bold mt-1 text-violet-400" id="stat-total-ganancia">$0.00</p>
-                    <div class="text-xs text-violet-500 mt-2 font-semibold">Utilidad libre de costos</div>
+                    <div class="text-xs text-violet-500 mt-2 font-semibold">Utilidad real estimada</div>
                 </div>
             </div>
 
-            <!-- Cobros Rápidos -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Siguientes Cobros -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 lg:col-span-2">
                     <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        Próximos Abonos sugeridos
+                        Abonos por Cobrar Sugeridos
                     </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-slate-300">
@@ -116,7 +121,7 @@
                                     <th class="px-4 py-3 rounded-l-lg">Cliente</th>
                                     <th class="px-4 py-3">Tanda / Sorteo</th>
                                     <th class="px-4 py-3">Monto Abono</th>
-                                    <th class="px-4 py-3">Deuda Restante</th>
+                                    <th class="px-4 py-3">Restante</th>
                                     <th class="px-4 py-3 rounded-r-lg text-right">Acción</th>
                                 </tr>
                             </thead>
@@ -127,16 +132,17 @@
                     </div>
                 </div>
 
+                <!-- Acceso Rápido -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-100 mb-2">Acceso Rápido</h3>
-                        <p class="text-slate-400 text-sm mb-4">Usa estos accesos directos rápidos.</p>
+                        <h3 class="text-lg font-bold text-slate-100 mb-2">Acciones Rápidas</h3>
+                        <p class="text-slate-400 text-sm mb-4">Usa estos botones rápidos para agregar datos.</p>
                         <div class="space-y-3">
-                            <button onclick="openTandaModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2">
+                            <button onclick="openTandaModal()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
                                 Crear Nueva Tanda
                             </button>
                             <button onclick="switchTab('inventario'); openProductModal();" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-700">
-                                Agregar Producto Cerrado
+                                Agregar Producto
                             </button>
                         </div>
                     </div>
@@ -148,15 +154,15 @@
         <section id="tab-tandas" class="space-y-6 hidden">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-100">Control de Tandas</h2>
-                    <p class="text-slate-400 text-sm">Monitorea los abonos y avance de cada cliente.</p>
+                    <h2 class="text-2xl font-bold text-slate-100">Control de Tandas Activas</h2>
+                    <p class="text-slate-400 text-sm">Gestiona abonos y el total cobrado de cada cliente.</p>
                 </div>
                 <button onclick="openTandaModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all text-sm">
                     Nueva Tanda
                 </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tandas-container">
-                <!-- Tarjetas -->
+                <!-- Tarjetas de Tanda -->
             </div>
         </section>
 
@@ -165,7 +171,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-100">Catálogo de Productos Cerrados</h2>
-                    <p class="text-slate-400 text-sm">Administra costos, precios y existencias físicas.</p>
+                    <p class="text-slate-400 text-sm">Administra costos, precios de venta y existencias.</p>
                 </div>
                 <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all text-sm">
                     Nuevo Producto
@@ -177,7 +183,7 @@
                         <thead class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider">
                             <tr>
                                 <th class="px-6 py-4">Producto</th>
-                                <th class="px-6 py-4">Precio Costo</th>
+                                <th class="px-6 py-4">Costo</th>
                                 <th class="px-6 py-4">Precio Venta</th>
                                 <th class="px-6 py-4">Ganancia Directa</th>
                                 <th class="px-6 py-4">Stock</th>
@@ -195,7 +201,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-auto border-t border-slate-800 bg-slate-900/40 py-4 text-center text-xs text-slate-500">
-        <p>TandaManager Pro &copy; 2026. Control privado de ventas compartido.</p>
+        <p>TandaManager Pro &copy; 2026. Control de ventas compartido.</p>
     </footer>
 
     <!-- ================= MODALES ================= -->
@@ -208,17 +214,17 @@
             </div>
             <div class="p-6 space-y-4">
                 <p class="text-xs text-slate-400">
-                    Inventen una <strong>Contraseña Única</strong> y escríbanla exactamente igual en ambos teléfonos para ver lo mismo al instante.
+                    Inventen una <strong>Contraseña Única</strong> y escríbanla exactamente igual en el celular de tu esposa y en el tuyo para compartir toda la información al instante.
                 </p>
                 <div>
-                    <label class="block text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Contraseña Familiar Secreta</label>
-                    <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" placeholder="Ej: ricardo-y-paty-tandas">
+                    <label class="block text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Contraseña Compartida</label>
+                    <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" placeholder="Ej: tanda-ricardo-y-esposa">
                 </div>
                 <div class="bg-indigo-950/20 rounded-xl border border-indigo-800/30 p-3">
                     <div class="text-[11px] font-bold text-indigo-400 uppercase">Estado:</div>
                     <div class="text-xs text-slate-300 font-semibold flex items-center gap-2 mt-1">
                         <span id="modal-sync-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                        <span id="modal-sync-status-text">Guardando de manera local</span>
+                        <span id="modal-sync-status-text">Guardando localmente</span>
                     </div>
                 </div>
                 <div class="flex gap-3">
@@ -258,13 +264,13 @@
                 <!-- SECCIÓN PRODUCTOS MÚLTIPLES -->
                 <div>
                     <div class="flex justify-between items-center mb-1.5">
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider">Productos de la Tanda</label>
-                        <button type="button" onclick="addProductRowToModal()" class="text-[10px] bg-slate-800 hover:bg-indigo-900/30 text-indigo-400 font-bold px-2 py-1 rounded-lg border border-slate-700/80">
+                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider">Productos Pedidos</label>
+                        <button type="button" onclick="addProductRowToModal()" class="text-[10px] bg-indigo-900/40 hover:bg-indigo-600 text-indigo-300 font-bold px-2 py-1 rounded-lg border border-indigo-700/50">
                             + Añadir otro
                         </button>
                     </div>
                     <div id="tanda-products-list" class="space-y-2 max-h-44 overflow-y-auto">
-                        <!-- Filas -->
+                        <!-- Filas dinámicas -->
                     </div>
                 </div>
 
@@ -340,7 +346,7 @@
     <!-- MODAL CONFIRMACIÓN -->
     <div id="modal-confirm" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden p-6 text-center space-y-4">
-            <h3 class="text-lg font-bold text-slate-100">¿Estás completamente seguro?</h3>
+            <h3 class="text-lg font-bold text-slate-100">¿Estás seguro?</h3>
             <p class="text-xs text-slate-400" id="confirm-modal-text"></p>
             <div class="flex gap-3">
                 <button onclick="closeConfirmModal(false)" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-xs border border-slate-700">Cancelar</button>
@@ -349,36 +355,24 @@
         </div>
     </div>
 
-    <!-- ================= CONEXIÓN FIREBASE + LÓGICA COMPACTA ================= -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Parámetros proporcionados por el entorno o por defecto
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tanda-manager-shared-app';
-        const firebaseConfig = JSON.parse(__firebase_config);
-
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let userAuthenticated = null;
+    <!-- ================= CODIGO DE LÓGICA SIN ERRORES (PURA Y RESISTENTE) ================= -->
+    <script>
+        const BUCKET_ID = "ricardo_t_app_2026";
         let syncCode = localStorage.getItem('tanda_sync_code') || "";
+        let syncInterval = null;
 
-        // Base de Datos local por defecto (Guns n Roses y Club América para Ricardo)
+        // Base de Datos inicial (Cosas de Guns n Roses y Club América de ejemplo)
         let defaultState = {
             products: [
-                { id: "p1", name: "Guns N' Roses: Appetite for Destruction Super Deluxe Box Set", cost: 1200, price: 2500, stock: 3 },
-                { id: "p2", name: "Jersey Oficial Club América Edición Especial", cost: 600, price: 1300, stock: 8 },
-                { id: "p3", name: "Perfume Cerrado Imperial Rocker Edition", cost: 400, price: 950, stock: 12 }
+                { id: "p1", name: "Guns N' Roses: Appetite for Destruction Box Set", cost: 1200, price: 2500, stock: 3 },
+                { id: "p2", name: "Jersey Club América Edición Especial", cost: 600, price: 1300, stock: 8 },
+                { id: "p3", name: "Perfume Cerrado Imperial Rocker", cost: 400, price: 950, stock: 12 }
             ],
             tandas: [
                 {
                     id: "t1",
-                    clientName: "Ricardo (Ejemplo)",
-                    clientPhone: "555-412-1985",
+                    clientName: "Juan Gómez (Ejemplo)",
+                    clientPhone: "555-123-4567",
                     totalAmount: 3800,
                     numInstallments: 10,
                     frequency: "Semanal",
@@ -386,8 +380,8 @@
                     slotNumber: 1,
                     payments: [true, true, true, false, false, false, false, false, false, false],
                     products: [
-                        { productId: "p1", productName: "Guns N' Roses: Appetite for Destruction Super Deluxe Box Set", price: 2500, qty: 1 },
-                        { productId: "p2", productName: "Jersey Oficial Club América Edición Especial", price: 1300, qty: 1 }
+                        { productId: "p1", productName: "Guns N' Roses: Appetite for Destruction Box Set", price: 2500, qty: 1 },
+                        { productId: "p2", productName: "Jersey Club América Edición Especial", price: 1300, qty: 1 }
                     ]
                 }
             ]
@@ -396,107 +390,8 @@
         let state = JSON.parse(localStorage.getItem('tanda_local_state')) || defaultState;
         let onConfirmAction = null;
 
-        // --- SISTEMA DE AUTENTICACIÓN ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Error Auth:", error);
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userAuthenticated = user;
-                if (syncCode) {
-                    conectarFirestoreRealtime();
-                }
-            }
-        });
-
-        initAuth();
-
-        // --- CONEXIÓN DE BASE DE DATOS EN TIEMPO REAL (RULE 1 & 2) ---
-        let unsubProducts = null;
-        let unsubTandas = null;
-
-        function conectarFirestoreRealtime() {
-            if (!userAuthenticated || !syncCode) return;
-
-            if (unsubProducts) unsubProducts();
-            if (unsubTandas) unsubTandas();
-
-            const productsCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-            const tandasCol = collection(db, 'artifacts', appId, 'public', 'data', 'tandas');
-
-            // Cargar en vivo Productos filtrados por código familiar
-            unsubProducts = onSnapshot(productsCol, (snapshot) => {
-                const list = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.syncCode === syncCode) {
-                        list.push({ id: doc.id, ...data });
-                    }
-                });
-                if (list.length > 0) {
-                    state.products = list;
-                    localStorage.setItem('tanda_local_state', JSON.stringify(state));
-                    renderInventario();
-                    renderDashboard();
-                }
-                actualizarBadgeSync();
-            }, (error) => console.error(error));
-
-            // Cargar en vivo Tandas filtradas por código familiar
-            unsubTandas = onSnapshot(tandasCol, (snapshot) => {
-                const list = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.syncCode === syncCode) {
-                        list.push({ id: doc.id, ...data });
-                    }
-                });
-                state.tandas = list;
-                localStorage.setItem('tanda_local_state', JSON.stringify(state));
-                renderTandas();
-                renderDashboard();
-                actualizarBadgeSync();
-            }, (error) => console.error(error));
-        }
-
-        // Guardar cambios tanto local como nube
-        window.saveLocalState = async function() {
-            localStorage.setItem('tanda_local_state', JSON.stringify(state));
-            
-            // Si la nube está activa, subir este cambio de inmediato
-            if (userAuthenticated && syncCode) {
-                try {
-                    // Subir productos locales a Firestore
-                    for (const p of state.products) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', p.id), {
-                            ...p,
-                            syncCode: syncCode
-                        });
-                    }
-                    // Subir tandas locales a Firestore
-                    for (const t of state.tandas) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tandas', t.id), {
-                            ...t,
-                            syncCode: syncCode
-                        });
-                    }
-                } catch (e) {
-                    console.error("Error al sincronizar con Firebase:", e);
-                }
-            }
-        };
-
-        // --- SISTEMA DE NAVEGACIÓN ---
-        window.switchTab = function(tabId) {
+        // --- NAVEGACIÓN ---
+        function switchTab(tabId) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-tandas').classList.add('hidden');
             document.getElementById('tab-inventario').classList.add('hidden');
@@ -514,9 +409,15 @@
             renderDashboard();
             renderTandas();
             renderInventario();
-        };
+        }
 
-        // --- INTERFAZ GRAFICA (RENDERS) ---
+        // Guardar Local + Sincronización automática
+        async function saveLocalState() {
+            localStorage.setItem('tanda_local_state', JSON.stringify(state));
+            await subirCambiosALaNube();
+        }
+
+        // --- DASHBOARD ---
         function renderDashboard() {
             let totalVendido = 0;
             let totalCobrado = 0;
@@ -548,6 +449,7 @@
             const porcentajeCobrado = totalVendido > 0 ? Math.round((totalCobrado / totalVendido) * 100) : 0;
             document.getElementById('stat-cobrado-porcentaje').innerText = `${porcentajeCobrado}%`;
 
+            // Rellenar abonos sugeridos
             const proximosTable = document.getElementById('table-proximos-pagos');
             proximosTable.innerHTML = '';
 
@@ -557,7 +459,7 @@
                 proximosTable.innerHTML = `
                     <tr>
                         <td colspan="5" class="px-4 py-8 text-center text-slate-500">
-                            🤘 ¡Ningún abono pendiente hoy! Todo cobrado.
+                            🎉 ¡Todo al corriente en las tandas hoy!
                         </td>
                     </tr>
                 `;
@@ -581,7 +483,7 @@
                     </td>
                     <td class="px-4 py-3.5">
                         <span class="text-indigo-400 font-bold text-xs bg-indigo-500/10 px-2 py-1 rounded">N° ${t.slotNumber || '-'}</span>
-                        <span class="text-xs text-slate-400 ml-1.5 truncate max-w-[150px] inline-block align-middle" title="${prodSummary}">${prodSummary}</span>
+                        <span class="text-xs text-slate-400 ml-1.5 truncate max-w-[150px] inline-block align-middle">${prodSummary}</span>
                     </td>
                     <td class="px-4 py-3.5 font-bold text-emerald-400">
                         ${formatCurrency(abonoIndividual)}
@@ -590,7 +492,7 @@
                         ${formatCurrency(pendingAmount)}
                     </td>
                     <td class="px-4 py-3.5 text-right">
-                        <button onclick="abonaTandaRapido('${t.id}', ${indexUltimoPago})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+                        <button onclick="abonaTandaRapido('${t.id}', ${indexUltimoPago})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow">
                             Cobrar
                         </button>
                     </td>
@@ -599,6 +501,7 @@
             });
         }
 
+        // --- RENDER DE TANDAS COMPLETO ---
         function renderTandas() {
             const container = document.getElementById('tandas-container');
             container.innerHTML = '';
@@ -657,10 +560,10 @@
                             </div>
                             <div class="flex gap-2">
                                 <button onclick="editTanda('${t.id}')" class="p-1 text-slate-400 hover:text-slate-100 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    📝
                                 </button>
                                 <button onclick="triggerDeleteTanda('${t.id}')" class="p-1 text-slate-400 hover:text-red-500 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    ✕
                                 </button>
                             </div>
                         </div>
@@ -674,7 +577,7 @@
                             </div>
                         </div>
 
-                        <!-- Detalle exacto de lo pagado y restante solicitado -->
+                        <!-- Cuentas claras solicitadas -->
                         <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-900/80 mb-4 space-y-1">
                             <div class="flex justify-between text-xs font-semibold">
                                 <span class="text-slate-400">Progreso:</span>
@@ -701,6 +604,7 @@
             });
         }
 
+        // --- CATALOGO ---
         function renderInventario() {
             const tableBody = document.getElementById('table-productos');
             tableBody.innerHTML = '';
@@ -731,11 +635,11 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <div class="flex gap-2 justify-end">
-                            <button onclick="editProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-slate-100">
+                        <div class="flex gap-2 justify-end text-lg">
+                            <button onclick="editProduct('${p.id}')" class="p-1 text-slate-400 hover:text-slate-100">
                                 📝
                             </button>
-                            <button onclick="triggerDeleteProduct('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-500">
+                            <button onclick="triggerDeleteProduct('${p.id}')" class="p-1 text-slate-400 hover:text-red-500">
                                 ✕
                             </button>
                         </div>
@@ -745,8 +649,8 @@
             });
         }
 
-        // --- MANEJO DE PRODUCTOS MÚLTIPLES EN EL MODAL ---
-        window.addProductRowToModal = function(productId = '', qty = 1) {
+        // --- PRODUCTOS MÚLTIPLES EN EL MODAL ---
+        function addProductRowToModal(productId = '', qty = 1) {
             const container = document.getElementById('tanda-products-list');
             const rowId = 'prow_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
 
@@ -773,17 +677,17 @@
             `;
             container.appendChild(row);
             recalculateTandaTotal();
-        };
+        }
 
-        window.removeProductRow = function(rowId) {
+        function removeProductRow(rowId) {
             const row = document.getElementById(rowId);
             if (row) {
                 row.remove();
                 recalculateTandaTotal();
             }
-        };
+        }
 
-        window.recalculateTandaTotal = function() {
+        function recalculateTandaTotal() {
             const rows = document.querySelectorAll('#tanda-products-list > div');
             let total = 0;
             rows.forEach(row => {
@@ -799,10 +703,10 @@
                 }
             });
             document.getElementById('tanda-amount').value = total;
-        };
+        }
 
         // --- OPERACIONES: TANDAS ---
-        window.openTandaModal = function() {
+        function openTandaModal() {
             document.getElementById('tanda-modal-title').innerText = "Registrar Nueva Tanda";
             document.getElementById('tanda-id').value = '';
             document.getElementById('tanda-client').value = '';
@@ -818,13 +722,13 @@
             }
 
             document.getElementById('modal-tanda').classList.remove('hidden');
-        };
+        }
 
-        window.closeTandaModal = function() {
+        function closeTandaModal() {
             document.getElementById('modal-tanda').classList.add('hidden');
-        };
+        }
 
-        window.saveTanda = async function(event) {
+        async function saveTanda(event) {
             event.preventDefault();
             const id = document.getElementById('tanda-id').value;
             const client = document.getElementById('tanda-client').value;
@@ -862,7 +766,7 @@
             });
 
             if (selectedProducts.length === 0) {
-                showToast("Por favor, agrega al menos un producto", "error");
+                showToast("Agrega al menos un producto", "error");
                 return;
             }
 
@@ -892,7 +796,7 @@
                         payments: newPayments,
                         products: selectedProducts
                     };
-                    showToast("Tanda editada");
+                    showToast("Tanda editada con éxito");
                 }
             } else {
                 const nueva = {
@@ -908,16 +812,16 @@
                     products: selectedProducts
                 };
                 state.tandas.push(nueva);
-                showToast("¡Tanda registrada!");
+                showToast("¡Tanda guardada correctamente!");
             }
 
             await saveLocalState();
             closeTandaModal();
             renderDashboard();
             renderTandas();
-        };
+        }
 
-        window.editTanda = function(id) {
+        function editTanda(id) {
             const t = state.tandas.find(t => t.id === id);
             if (!t) return;
 
@@ -940,32 +844,32 @@
 
             document.getElementById('tanda-amount').value = t.totalAmount;
             document.getElementById('modal-tanda').classList.remove('hidden');
-        };
+        }
 
-        window.togglePaymentState = async function(tandaId, index) {
+        async function togglePaymentState(tandaId, index) {
             const t = state.tandas.find(t => t.id === tandaId);
             if (t) {
                 t.payments[index] = !t.payments[index];
                 await saveLocalState();
                 renderDashboard();
                 renderTandas();
-                showToast("Pago de abono guardado");
+                showToast("Abono actualizado");
             }
-        };
+        }
 
-        window.abonaTandaRapido = async function(tandaId, index) {
+        async function abonaTandaRapido(tandaId, index) {
             const t = state.tandas.find(t => t.id === tandaId);
             if (t) {
                 t.payments[index] = true;
                 await saveLocalState();
                 renderDashboard();
                 renderTandas();
-                showToast(`¡Abono registrado!`);
+                showToast("¡Abono registrado!");
             }
-        };
+        }
 
-        // --- OPERACIONES: CATÁLOGO ---
-        window.openProductModal = function() {
+        // --- CATALOGO ---
+        function openProductModal() {
             document.getElementById('product-modal-title').innerText = "Registrar Producto";
             document.getElementById('product-id').value = '';
             document.getElementById('product-name').value = '';
@@ -973,13 +877,13 @@
             document.getElementById('product-price').value = '';
             document.getElementById('product-stock').value = '1';
             document.getElementById('modal-product').classList.remove('hidden');
-        };
+        }
 
-        window.closeProductModal = function() {
+        function closeProductModal() {
             document.getElementById('modal-product').classList.add('hidden');
-        };
+        }
 
-        window.saveProduct = async function(event) {
+        async function saveProduct(event) {
             event.preventDefault();
             const id = document.getElementById('product-id').value;
             const name = document.getElementById('product-name').value;
@@ -1006,9 +910,9 @@
             closeProductModal();
             renderInventario();
             renderDashboard();
-        };
+        }
 
-        window.editProduct = function(id) {
+        function editProduct(id) {
             const p = state.products.find(p => p.id === id);
             if (!p) return;
 
@@ -1019,42 +923,34 @@
             document.getElementById('product-price').value = p.price;
             document.getElementById('product-stock').value = p.stock;
             document.getElementById('modal-product').classList.remove('hidden');
-        };
+        }
 
-        // --- CONFIRMACIONES SEGURAS ---
+        // --- DIÁLOGOS ---
         function triggerConfirm(text, onAccept) {
             document.getElementById('confirm-modal-text').innerText = text;
             document.getElementById('modal-confirm').classList.remove('hidden');
             onConfirmAction = onAccept;
         }
 
-        window.closeConfirmModal = function(accepted) {
+        function closeConfirmModal(accepted) {
             document.getElementById('modal-confirm').classList.add('hidden');
             if (accepted && onConfirmAction) {
                 onConfirmAction();
             }
             onConfirmAction = null;
-        };
+        }
 
-        window.triggerDeleteTanda = function(id) {
-            triggerConfirm("¿Eliminar de forma definitiva esta tanda de clientes?", async () => {
+        function triggerDeleteTanda(id) {
+            triggerConfirm("¿Eliminar por completo esta tanda de la nube?", async () => {
                 state.tandas = state.tandas.filter(t => t.id !== id);
-                
-                // Borrar también en Firebase
-                if (userAuthenticated && syncCode) {
-                    try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tandas', id));
-                    } catch (err) { console.error(err); }
-                }
-
                 await saveLocalState();
                 renderDashboard();
                 renderTandas();
-                showToast("Tanda eliminada", "error");
+                showToast("Tanda borrada", "error");
             });
-        };
+        }
 
-        window.triggerDeleteProduct = function(id) {
+        function triggerDeleteProduct(id) {
             const enUso = state.tandas.some(t => {
                 const tProducts = t.products || [];
                 return tProducts.some(tp => tp.productId === id);
@@ -1063,32 +959,24 @@
                 showToast("No se puede borrar, el producto está asignado a una tanda", "error");
                 return;
             }
-            triggerConfirm("¿Borrar este producto de tu inventario?", async () => {
+            triggerConfirm("¿Eliminar este producto del catálogo?", async () => {
                 state.products = state.products.filter(p => p.id !== id);
-
-                // Borrar también en Firebase
-                if (userAuthenticated && syncCode) {
-                    try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-                    } catch (err) { console.error(err); }
-                }
-
                 await saveLocalState();
                 renderInventario();
-                showToast("Producto removido", "error");
+                showToast("Producto eliminado", "error");
             });
-        };
+        }
 
-        // --- SISTEMA DE CONTROL DE SINCRONIZACIÓN NATIVA FIREBASE ---
-        window.openSyncModal = function() {
+        // --- SISTEMA DE SINCRONIZACIÓN AUTOMÁTICA ULTRA-RESISTENTE ---
+        function openSyncModal() {
             document.getElementById('sync-code-input').value = syncCode;
             actualizarUIModalSync();
             document.getElementById('modal-sync').classList.remove('hidden');
-        };
+        }
 
-        window.closeSyncModal = function() {
+        function closeSyncModal() {
             document.getElementById('modal-sync').classList.add('hidden');
-        };
+        }
 
         function actualizarUIModalSync() {
             const modalDot = document.getElementById('modal-sync-dot');
@@ -1097,11 +985,11 @@
 
             if (syncCode) {
                 modalDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                modalText.innerText = `Sincronizado con el código secreto: ${syncCode}`;
+                modalText.innerText = `Sincronizado con el código: ${syncCode}`;
                 btnDesc.classList.remove('hidden');
             } else {
                 modalDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-                modalText.innerText = "Guardando de manera local (Sin sincronizar)";
+                modalText.innerText = "Guardando de manera local (Celulares desconectados)";
                 btnDesc.classList.add('hidden');
             }
         }
@@ -1110,19 +998,22 @@
             const dot = document.getElementById('sync-dot');
             const text = document.getElementById('sync-text');
             const badge = document.getElementById('sync-badge');
+            const btnSync = document.getElementById('btn-sync-now');
 
             if (syncCode) {
                 dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
                 text.innerText = `Nube Activa: ${syncCode}`;
                 badge.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer";
+                btnSync.classList.remove('hidden');
             } else {
                 dot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
                 text.innerText = "Solo Local (Toca para conectar)";
                 badge.className = "inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer";
+                btnSync.classList.add('hidden');
             }
         }
 
-        window.conectarNube = async function() {
+        async function conectarNube() {
             const inputVal = document.getElementById('sync-code-input').value.trim();
             if (!inputVal) {
                 showToast("Por favor escribe un código", "error");
@@ -1131,32 +1022,119 @@
 
             syncCode = inputVal;
             localStorage.setItem('tanda_sync_code', syncCode);
-            showToast("Sincronizando celulares...");
+            showToast("Buscando datos familiares...");
 
-            // Subir el estado actual de inmediato para inicializar la base de datos compartida
-            await saveLocalState();
-            
-            // Conectar la escucha en tiempo real de Firestore
-            conectarFirestoreRealtime();
+            const datosNube = await bajarDatosDeLaNube(syncCode);
+            if (datosNube) {
+                state = datosNube;
+                localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                showToast("¡Celulares enlazados con éxito!");
+            } else {
+                await subirCambiosALaNube();
+                showToast("Código familiar creado en la nube");
+            }
 
             actualizarUIModalSync();
             actualizarBadgeSync();
             closeSyncModal();
-        };
+            
+            renderDashboard();
+            renderTandas();
+            renderInventario();
 
-        window.desconectarNube = function() {
+            iniciarAutoSync();
+        }
+
+        function desconectarNube() {
             syncCode = "";
             localStorage.removeItem('tanda_sync_code');
-            if (unsubProducts) unsubProducts();
-            if (unsubTandas) unsubTandas();
+            if (syncInterval) clearInterval(syncInterval);
 
-            showToast("Sincronización desactivada", "error");
+            showToast("Sincronización apagada", "error");
             actualizarUIModalSync();
             actualizarBadgeSync();
             closeSyncModal();
-        };
+            renderDashboard();
+            renderTandas();
+            renderInventario();
+        }
 
-        // --- UTILERÍAS ---
+        async function forzarSincronizacionManual() {
+            if (!syncCode) return;
+            const btn = document.getElementById('btn-sync-now');
+            btn.innerText = "🔄 Sincronizando...";
+            
+            const datos = await bajarDatosDeLaNube(syncCode);
+            if (datos) {
+                state = datos;
+                localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                renderDashboard();
+                renderTandas();
+                renderInventario();
+                showToast("¡Actualizado!");
+            } else {
+                showToast("Todo al día", "info");
+            }
+            btn.innerText = "🔄 Sincronizar ya";
+        }
+
+        async function subirCambiosALaNube() {
+            if (!syncCode) return;
+            try {
+                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/${BUCKET_ID}_${syncCode}`;
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state)
+                });
+            } catch (e) {
+                console.error("Error al subir:", e);
+            }
+        }
+
+        // Se agregó cache buster y headers estrictos para Android (Chrome)
+        async function bajarDatosDeLaNube(code) {
+            try {
+                const cacheBuster = Date.now();
+                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/${BUCKET_ID}_${code}?t=${cacheBuster}`;
+                const res = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                if (res.status === 200) {
+                    return await res.json();
+                }
+            } catch (e) {
+                console.error("Error al bajar:", e);
+            }
+            return null;
+        }
+
+        function iniciarAutoSync() {
+            if (syncInterval) clearInterval(syncInterval);
+            if (!syncCode) return;
+
+            // Busca cambios nuevos en segundo plano cada 12 segundos
+            syncInterval = setInterval(async () => {
+                const datos = await bajarDatosDeLaNube(syncCode);
+                if (datos) {
+                    if (JSON.stringify(datos) !== JSON.stringify(state)) {
+                        state = datos;
+                        localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                        renderDashboard();
+                        renderTandas();
+                        renderInventario();
+                        showToast("¡Sincronizado con cambios nuevos!");
+                    }
+                }
+            }, 12000);
+        }
+
+        // --- AUXILIARES ---
         function formatCurrency(value) {
             return new Intl.NumberFormat('es-MX', {
                 style: 'currency',
@@ -1184,7 +1162,6 @@
             }, 3500);
         }
 
-        // Carga Inicial
         window.onload = function() {
             actualizarBadgeSync();
             renderDashboard();
@@ -1192,7 +1169,7 @@
             renderInventario();
 
             if (syncCode) {
-                conectarFirestoreRealtime();
+                iniciarAutoSync();
             }
         };
     </script>
