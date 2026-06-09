@@ -3,39 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TandaManager</title>
+    <title>TandaManager - Rock Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white font-sans p-4">
-    <div id="root" class="max-w-md mx-auto">
-        <h1 class="text-2xl font-bold text-yellow-500 mb-6">TandaManager - Rock Edition</h1>
-        <div id="app-content" class="space-y-4">
-            <p>Iniciando sistema...</p>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4">
+    <div class="max-w-md mx-auto">
+        <header class="mb-6 border-b border-slate-800 pb-4">
+            <h1 class="text-2xl font-bold text-indigo-400">TandaManager</h1>
+            <p class="text-xs text-slate-500 italic">"Appetite for Calculation"</p>
+        </header>
+
+        <div id="content" class="space-y-4">
+            <!-- Aquí irán los datos -->
+            <button onclick="cargarSistema()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-bold">Cargar Sistema</button>
         </div>
     </div>
 
     <script>
-        // Borramos todo rastro de versiones anteriores para forzar un inicio limpio
-        localStorage.clear();
-
-        const data = {
-            titulo: "Bienvenido Ricardo",
-            mensaje: "El sistema se ha reiniciado correctamente.",
-            opciones: ["Cargar Inventario", "Ver Tandas"]
+        let estado = {
+            usuario: "Ricardo",
+            bandaFav: "Guns N' Roses",
+            tandas: []
         };
 
-        function render() {
-            document.getElementById('app-content').innerHTML = `
-                <div class="bg-gray-900 p-6 rounded-xl border border-gray-700">
-                    <h2 class="text-xl font-bold mb-2">${data.titulo}</h2>
-                    <p class="text-gray-400 mb-4">${data.mensaje}</p>
-                    <div class="space-y-2">
-                        ${data.opciones.map(o => `<button class="w-full bg-indigo-700 hover:bg-indigo-600 p-3 rounded-lg font-bold">${o}</button>`).join('')}
+        function cargarSistema() {
+            document.getElementById('content').innerHTML = `
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800">
+                    <h2 class="text-lg font-bold mb-1">¡Bienvenido, ${estado.usuario}!</h2>
+                    <p class="text-sm text-slate-400 mb-4">Escuchando ${estado.bandaFav}...</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-black p-3 rounded-lg border border-slate-700">
+                            <span class="block text-[10px] text-slate-500 uppercase">Tandas</span>
+                            <span class="text-xl font-bold">0</span>
+                        </div>
+                        <div class="bg-black p-3 rounded-lg border border-slate-700">
+                            <span class="block text-[10px] text-slate-500 uppercase">Estado</span>
+                            <span class="text-xl font-bold text-emerald-400">OK</span>
+                        </div>
                     </div>
                 </div>
             `;
         }
-        render();
     </script>
 </body>
 </html>
