@@ -10,13 +10,12 @@
     <div class="max-w-md mx-auto space-y-6">
         <header class="border-b border-slate-800 pb-4">
             <h1 class="text-2xl font-bold text-indigo-400">TandaManager Pro</h1>
-            <p class="text-[10px] text-slate-500 italic">Rock & Metal Control</p>
+            <p class="text-[10px] text-slate-500 italic">Rock & Metal Control 🤘</p>
         </header>
 
-        <!-- Pestañas -->
         <div class="flex gap-2">
-            <button onclick="tab('tandas')" class="flex-1 bg-indigo-600 p-2 rounded-lg text-xs font-bold">Tandas</button>
-            <button onclick="tab('productos')" class="flex-1 bg-slate-800 p-2 rounded-lg text-xs font-bold">Catálogo</button>
+            <button onclick="ver('tandas')" class="flex-1 bg-indigo-600 p-2 rounded-lg text-xs font-bold">Tandas</button>
+            <button onclick="ver('productos')" class="flex-1 bg-slate-800 p-2 rounded-lg text-xs font-bold">Catálogo</button>
         </div>
 
         <div id="vista" class="space-y-4"></div>
@@ -24,31 +23,54 @@
 
     <script>
         let db = JSON.parse(localStorage.getItem('db')) || { tandas: [], productos: [] };
+        function guardar() { localStorage.setItem('db', JSON.stringify(db)); ver(db.ultimaVista || 'tandas'); }
 
-        function save() { localStorage.setItem('db', JSON.stringify(db)); render(); }
-
-        function tab(view) {
-            const v = document.getElementById('vista');
-            if (view === 'tandas') {
-                v.innerHTML = `<h2 class="font-bold">Tandas</h2>
-                    ${db.tandas.map((t, i) => `
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between">
-                            <div><p class="font-bold">${t.nombre}</p><p class="text-xs text-slate-400">$${t.monto}</p></div>
-                            <button onclick="db.tandas.splice(${i},1); save();" class="text-red-500">✕</button>
-                        </div>`).join('')}
-                    <button onclick="let n = prompt('Nombre:'); if(n) {db.tandas.push({nombre:n, monto:0}); save();}" class="w-full bg-indigo-600 p-2 rounded-lg text-xs font-bold">+ Nueva</button>`;
+        function ver(v) {
+            db.ultimaVista = v;
+            const el = document.getElementById('vista');
+            if (v === 'tandas') {
+                el.innerHTML = `<h2 class="font-bold text-sm">Tandas Activas</h2>` + 
+                    db.tandas.map((t, i) => `
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                            <p class="font-bold text-indigo-300">${t.nombre}</p>
+                            <p class="text-xs text-slate-400">Prod: ${t.prod} | Monto: $${t.monto}</p>
+                            <div class="mt-2 flex gap-1 flex-wrap">
+                                ${Array.from({length: t.semanas}).map((_, s) => `
+                                    <button onclick="alternarPago(${i}, ${s})" class="w-6 h-6 rounded ${t.pagos[s] ? 'bg-emerald-600' : 'bg-slate-800'} text-[9px]">${s+1}</button>
+                                `).join('')}
+                            </div>
+                            <button onclick="db.tandas.splice(${i},1); guardar();" class="text-red-500 text-[9px] mt-3">Eliminar Tanda</button>
+                        </div>`).join('') +
+                    `<button onclick="nuevaTanda()" class="w-full bg-indigo-600 p-2 rounded-lg text-xs font-bold">+ Registrar Tanda</button>`;
             } else {
-                v.innerHTML = `<h2 class="font-bold">Catálogo</h2>
-                    ${db.productos.map((p, i) => `
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between">
-                            <p>${p.nombre}</p>
-                            <button onclick="db.productos.splice(${i},1); save();" class="text-red-500">✕</button>
-                        </div>`).join('')}
-                    <button onclick="let n = prompt('Producto:'); if(n) {db.productos.push({nombre:n}); save();}" class="w-full bg-slate-800 p-2 rounded-lg text-xs font-bold">+ Producto</button>`;
+                el.innerHTML = `<h2 class="font-bold text-sm">Catálogo</h2>` +
+                    db.productos.map((p, i) => `
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center">
+                            <span>${p}</span>
+                            <button onclick="db.productos.splice(${i},1); guardar();" class="text-red-500 text-xs">✕</button>
+                        </div>`).join('') +
+                    `<button onclick="let p = prompt('Nombre del producto:'); if(p) {db.productos.push(p); guardar();}" class="w-full bg-slate-800 p-2 rounded-lg text-xs font-bold">+ Añadir Producto</button>`;
             }
         }
-        function render() { tab(document.querySelector('.bg-indigo-600').innerText.toLowerCase()); }
-        tab('tandas');
+
+        function nuevaTanda() {
+            if(db.productos.length === 0) { alert("¡Agrega productos al catálogo primero!"); return; }
+            let nombre = prompt("Nombre del cliente:");
+            let prod = prompt("¿Qué producto quiere?");
+            let monto = prompt("Monto total:");
+            let semanas = parseInt(prompt("¿Cuántas semanas?")) || 10;
+            if(nombre && prod && monto) {
+                db.tandas.push({nombre, prod, monto, semanas, pagos: Array(semanas).fill(false)});
+                guardar();
+            }
+        }
+
+        function alternarPago(tIdx, pIdx) {
+            db.tandas[tIdx].pagos[pIdx] = !db.tandas[tIdx].pagos[pIdx];
+            guardar();
+        }
+
+        ver(db.ultimaVista || 'tandas');
     </script>
 </body>
 </html>
