@@ -4,375 +4,301 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TandaManager Pro</title>
-    <!-- Tailwind CSS para diseño moderno y oscuro -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        slate: {
-                            850: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        }
+                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' }
                     }
                 }
             }
         }
     </script>
-    <style>
-        html {
-            scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
-        }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- HEADER / NAVEGACIÓN -->
+    <!-- CABECERA -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 px-4 py-3">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg">
-                    <!-- Icono Rayo Guns N Roses style -->
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
+                    <span class="text-xl">⚡</span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">TandaManager Pro</h1>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <span id="sync-badge" class="inline-flex items-center gap-1.5 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer" onclick="openSyncModal()">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500" id="sync-dot"></span>
-                            <span id="sync-text">Solo Local (Conectar Celulares)</span>
+                    <h1 class="text-lg font-bold text-white">TandaManager Pro</h1>
+                    <div class="flex flex-wrap items-center gap-2 mt-0.5">
+                        <span id="sync-badge" class="inline-flex items-center gap-1.5 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-bold cursor-pointer" onclick="openSyncModal()">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500" id="sync-dot"></span>
+                            <span id="sync-text">Solo Local (Toca para conectar)</span>
                         </span>
-                        <!-- Botón para forzar actualización inmediata -->
-                        <button onclick="forzarSincronizacionManual()" id="btn-sync-now" class="hidden text-[10px] bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white px-2 py-0.5 rounded font-bold transition-all">
+                        <button onclick="forzarSincronizacionManual()" id="btn-sync-now" class="hidden text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-0.5 rounded font-bold transition-all">
                             🔄 Sincronizar ya
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Menú de Navegación -->
             <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
-                    Tablero
-                </button>
-                <button onclick="switchTab('tandas')" id="nav-tandas" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
-                    Tandas
-                </button>
-                <button onclick="switchTab('inventario')" id="nav-inventario" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200">
-                    Catálogo
-                </button>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">Tablero</button>
+                <button onclick="switchTab('tandas')" id="nav-tandas" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400">Tandas</button>
+                <button onclick="switchTab('inventario')" id="nav-inventario" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400">Catálogo</button>
             </nav>
         </div>
     </header>
 
-    <!-- NOTIFICACIONES (TOASTS) -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-
-        <!-- ================= TABLERO (DASHBOARD) ================= -->
+    <!-- CONTENIDO -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+        <!-- TABLERO -->
         <section id="tab-dashboard" class="space-y-6">
-            <!-- Métricas -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-sm text-slate-400 font-medium">Total de Ventas</p>
-                    <p class="text-2xl font-bold mt-1 text-slate-100" id="stat-total-ventas">$0.00</p>
-                    <div class="text-xs text-indigo-400 mt-2 font-semibold">Valor total de tanda colocada</div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Total Ventas</p>
+                    <p class="text-lg sm:text-2xl font-bold mt-1 text-slate-100" id="stat-total-ventas">$0.00</p>
                 </div>
-
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-sm text-slate-400 font-medium">Total Cobrado</p>
-                    <p class="text-2xl font-bold mt-1 text-emerald-400" id="stat-total-cobrado">$0.00</p>
-                    <div class="text-xs text-emerald-500 mt-2 font-semibold">
-                        <span id="stat-cobrado-porcentaje">0%</span> cobrado en total
-                    </div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Total Cobrado</p>
+                    <p class="text-lg sm:text-2xl font-bold mt-1 text-emerald-400" id="stat-total-cobrado">$0.00</p>
                 </div>
-
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-sm text-slate-400 font-medium">Pendiente por Cobrar</p>
-                    <p class="text-2xl font-bold mt-1 text-amber-400" id="stat-total-pendiente">$0.00</p>
-                    <div class="text-xs text-amber-500 mt-2 font-semibold">Dinero activo en la calle</div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Pendiente</p>
+                    <p class="text-lg sm:text-2xl font-bold mt-1 text-amber-400" id="stat-total-pendiente">$0.00</p>
                 </div>
-
-                <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                    <p class="text-sm text-slate-400 font-medium">Ganancia Estimada</p>
-                    <p class="text-2xl font-bold mt-1 text-violet-400" id="stat-total-ganancia">$0.00</p>
-                    <div class="text-xs text-violet-500 mt-2 font-semibold">Utilidad real estimada</div>
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                    <p class="text-xs text-slate-400 font-medium">Ganancia Est.</p>
+                    <p class="text-lg sm:text-2xl font-bold mt-1 text-violet-400" id="stat-total-ganancia">$0.00</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Siguientes Cobros -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 lg:col-span-2">
-                    <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        Abonos por Cobrar Sugeridos
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        Próximos Abonos Sugeridos
                     </h3>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-300">
-                            <thead class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-950 text-slate-400 uppercase">
                                 <tr>
-                                    <th class="px-4 py-3 rounded-l-lg">Cliente</th>
-                                    <th class="px-4 py-3">Tanda / Sorteo</th>
-                                    <th class="px-4 py-3">Monto Abono</th>
-                                    <th class="px-4 py-3">Restante</th>
-                                    <th class="px-4 py-3 rounded-r-lg text-right">Acción</th>
+                                    <th class="px-3 py-2">Cliente</th>
+                                    <th class="px-3 py-2">Productos</th>
+                                    <th class="px-3 py-2">Abono</th>
+                                    <th class="px-3 py-2">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-proximos-pagos" class="divide-y divide-slate-800/50">
-                                <!-- Dinámico -->
-                            </tbody>
+                            <tbody id="table-proximos-pagos" class="divide-y divide-slate-800/50"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Acceso Rápido -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-100 mb-2">Acciones Rápidas</h3>
-                        <p class="text-slate-400 text-sm mb-4">Usa estos botones rápidos para agregar datos.</p>
-                        <div class="space-y-3">
-                            <button onclick="openTandaModal()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-                                Crear Nueva Tanda
+                        <h3 class="text-sm font-bold text-slate-300 uppercase mb-2">Acciones Rápidas</h3>
+                        <div class="space-y-2">
+                            <button onclick="openTandaModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all">
+                                + Crear Nueva Tanda
                             </button>
-                            <button onclick="switchTab('inventario'); openProductModal();" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-700">
-                                Agregar Producto
+                            <button onclick="switchTab('inventario'); openProductModal();" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 px-4 rounded-xl text-xs transition-all border border-slate-700">
+                                + Registrar Producto
                             </button>
                         </div>
                     </div>
+                    <button onclick="openSyncModal()" class="text-xs text-indigo-400 font-bold hover:underline py-2 border-t border-slate-800 text-center block w-full">
+                        💬 Compartir app con mi esposa
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- ================= SECCIÓN TANDAS ================= -->
+        <!-- TANDAS -->
         <section id="tab-tandas" class="space-y-6 hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-100">Control de Tandas Activas</h2>
-                    <p class="text-slate-400 text-sm">Gestiona abonos y el total cobrado de cada cliente.</p>
-                </div>
-                <button onclick="openTandaModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all text-sm">
-                    Nueva Tanda
-                </button>
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">Tandas Registradas</h2>
+                <button onclick="openTandaModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-xs">Nueva Tanda</button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tandas-container">
-                <!-- Tarjetas de Tanda -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tandas-container"></div>
         </section>
 
-        <!-- ================= SECCIÓN INVENTARIO ================= -->
+        <!-- INVENTARIO -->
         <section id="tab-inventario" class="space-y-6 hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-100">Catálogo de Productos Cerrados</h2>
-                    <p class="text-slate-400 text-sm">Administra costos, precios de venta y existencias.</p>
-                </div>
-                <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all text-sm">
-                    Nuevo Producto
-                </button>
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white">Catálogo de Productos</h2>
+                <button onclick="openProductModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold text-xs">Nuevo Producto</button>
             </div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-300">
-                        <thead class="bg-slate-950 text-xs text-slate-400 uppercase tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4">Producto</th>
-                                <th class="px-6 py-4">Costo</th>
-                                <th class="px-6 py-4">Precio Venta</th>
-                                <th class="px-6 py-4">Ganancia Directa</th>
-                                <th class="px-6 py-4">Stock</th>
-                                <th class="px-6 py-4 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-productos" class="divide-y divide-slate-800/60">
-                            <!-- Filas -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-slate-950 text-slate-400 uppercase">
+                        <tr>
+                            <th class="px-4 py-3">Producto</th>
+                            <th class="px-4 py-3">Costo</th>
+                            <th class="px-4 py-3">Venta</th>
+                            <th class="px-4 py-3">Stock</th>
+                            <th class="px-4 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-productos" class="divide-y divide-slate-800/60"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="mt-auto border-t border-slate-800 bg-slate-900/40 py-4 text-center text-xs text-slate-500">
-        <p>TandaManager Pro &copy; 2026. Control de ventas compartido.</p>
-    </footer>
-
-    <!-- ================= MODALES ================= -->
     <!-- MODAL: SINCRONIZACIÓN -->
-    <div id="modal-sync" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-                <h3 class="font-bold text-slate-100">Sincronización Compartida (Galaxy y Redmi)</h3>
-                <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+    <div id="modal-sync" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-sm">Sincronizar Galaxy y Redmi</h3>
+                <button onclick="closeSyncModal()" class="text-slate-400">✕</button>
             </div>
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-400">
-                    Inventen una <strong>Contraseña Única</strong> y escríbanla exactamente igual en el celular de tu esposa y en el tuyo para compartir toda la información al instante.
-                </p>
-                <div>
-                    <label class="block text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Contraseña Compartida</label>
-                    <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" placeholder="Ej: tanda-ricardo-y-esposa">
-                </div>
-                <div class="bg-indigo-950/20 rounded-xl border border-indigo-800/30 p-3">
-                    <div class="text-[11px] font-bold text-indigo-400 uppercase">Estado:</div>
-                    <div class="text-xs text-slate-300 font-semibold flex items-center gap-2 mt-1">
-                        <span id="modal-sync-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                        <span id="modal-sync-status-text">Guardando localmente</span>
-                    </div>
-                </div>
-                <div class="flex gap-3">
-                    <button type="button" id="btn-desconectar" onclick="desconectarNube()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-xs border border-slate-700 hidden">Desconectar</button>
-                    <button type="button" onclick="conectarNube()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-bold text-xs">Sincronizar Celulares</button>
-                </div>
+            <p class="text-xs text-slate-400">Inventen una contraseña e ingresen exactamente la misma en ambos celulares.</p>
+            <input type="text" id="sync-code-input" class="w-full bg-slate-950 border border-slate-850 rounded-lg p-2.5 text-xs text-white" placeholder="Ej: tanda-ricardo-y-esposa">
+            
+            <div class="bg-indigo-950/20 rounded-xl border border-indigo-900/30 p-3">
+                <span class="text-[10px] text-indigo-400 font-bold block">ESTADO DE CONEXIÓN:</span>
+                <span id="modal-sync-status-text" class="text-xs text-slate-300 font-bold mt-1 block">Guardando solo en este teléfono</span>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="conectarNube()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-bold">Sincronizar Celular</button>
+                <button onclick="compartirPorWhatsApp()" id="btn-whatsapp" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold hidden">💬 Mandar enlace a mi esposa</button>
+                <button onclick="desconectarNube()" id="btn-desconectar" class="w-full bg-slate-800 text-slate-300 py-2 rounded-lg text-xs font-bold hidden">Desconectar Sincronización</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: TANDA -->
-    <div id="modal-tanda" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-                <h3 class="font-bold text-slate-100" id="tanda-modal-title">Registrar Nueva Tanda</h3>
-                <button onclick="closeTandaModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+    <!-- MODAL: REGISTRAR TANDA -->
+    <div id="modal-tanda" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-sm" id="tanda-modal-title">Registrar Tanda</h3>
+                <button onclick="closeTandaModal()" class="text-slate-400">✕</button>
             </div>
-            <form onsubmit="saveTanda(event)" class="p-6 space-y-4">
+            <form onsubmit="saveTanda(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="tanda-id">
-                
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Nombre del Cliente</label>
-                    <input type="text" id="tanda-client" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" placeholder="Ej. Ricardo">
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Cliente</label>
+                    <input type="text" id="tanda-client" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Contacto</label>
-                        <input type="text" id="tanda-phone" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" placeholder="Opcional">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Teléfono</label>
+                        <input type="text" id="tanda-phone" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">N° Tanda (Sorteo)</label>
-                        <input type="number" id="tanda-number" min="1" max="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">N° Sorteo</label>
+                        <input type="number" id="tanda-number" min="1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                     </div>
                 </div>
 
-                <!-- SECCIÓN PRODUCTOS MÚLTIPLES -->
+                <!-- PRODUCTOS MÚLTIPLES -->
                 <div>
-                    <div class="flex justify-between items-center mb-1.5">
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider">Productos Pedidos</label>
-                        <button type="button" onclick="addProductRowToModal()" class="text-[10px] bg-indigo-900/40 hover:bg-indigo-600 text-indigo-300 font-bold px-2 py-1 rounded-lg border border-indigo-700/50">
-                            + Añadir otro
-                        </button>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">Productos de esta Tanda</label>
+                        <button type="button" onclick="addProductRow()" class="text-[9px] bg-slate-800 text-indigo-400 font-bold px-2 py-0.5 rounded border border-slate-700">+ Añadir otro</button>
                     </div>
-                    <div id="tanda-products-list" class="space-y-2 max-h-44 overflow-y-auto">
-                        <!-- Filas dinámicas -->
+                    <div id="tanda-products-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Monto Total ($)</label>
+                        <input type="number" id="tanda-amount" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Semanas/Pagos</label>
+                        <input type="number" id="tanda-installments" required min="1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white" value="10">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Monto Total ($)</label>
-                        <input type="number" id="tanda-amount" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Número de Pagos</label>
-                        <input type="number" id="tanda-installments" required min="1" max="52" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" value="10">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Frecuencia</label>
-                        <select id="tanda-frequency" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Frecuencia</label>
+                        <select id="tanda-frequency" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                             <option value="Semanal">Semanal</option>
                             <option value="Quincenal">Quincenal</option>
                             <option value="Mensual">Mensual</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Fecha de Inicio</label>
-                        <input type="date" id="tanda-date" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Fecha de Inicio</label>
+                        <input type="date" id="tanda-date" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                     </div>
                 </div>
 
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="closeTandaModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-sm border border-slate-700">Cancelar</button>
-                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-semibold text-sm">Guardar Tanda</button>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeTandaModal()" class="w-1/2 bg-slate-800 text-slate-300 py-2 rounded-xl font-bold">Cancelar</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 text-white py-2 rounded-xl font-bold">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: PRODUCTO -->
-    <div id="modal-product" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-                <h3 class="font-bold text-slate-100" id="product-modal-title">Registrar Producto</h3>
-                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+    <div id="modal-product" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-sm" id="product-modal-title">Registrar Producto</h3>
+                <button onclick="closeProductModal()" class="text-slate-400">✕</button>
             </div>
-            <form onsubmit="saveProduct(event)" class="p-6 space-y-4">
+            <form onsubmit="saveProduct(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="product-id">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Nombre del Producto</label>
-                    <input type="text" id="product-name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none" placeholder="Ej. Perfume Cerrado, Reloj, Box Set">
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Nombre</label>
+                    <input type="text" id="product-name" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Costo Unitario ($)</label>
-                        <input type="number" id="product-cost" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Costo Unitario ($)</label>
+                        <input type="number" id="product-cost" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Precio de Venta ($)</label>
-                        <input type="number" id="product-price" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Precio Venta ($)</label>
+                        <input type="number" id="product-price" required min="0" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1.5">Stock Disponible</label>
-                    <input type="number" id="product-stock" required min="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 outline-none">
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Stock</label>
+                    <input type="number" id="product-stock" required min="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white" value="1">
                 </div>
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="closeProductModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-sm border border-slate-700">Cancelar</button>
-                    <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-semibold text-sm">Guardar Producto</button>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeProductModal()" class="w-1/2 bg-slate-800 text-slate-300 py-2 rounded-xl font-bold">Cancelar</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 text-white py-2 rounded-xl font-bold">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL CONFIRMACIÓN -->
-    <div id="modal-confirm" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden p-6 text-center space-y-4">
-            <h3 class="text-lg font-bold text-slate-100">¿Estás seguro?</h3>
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xs p-5 text-center space-y-3">
+            <h3 class="text-sm font-bold text-white">¿Estás seguro?</h3>
             <p class="text-xs text-slate-400" id="confirm-modal-text"></p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirmModal(false)" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl font-semibold text-xs border border-slate-700">Cancelar</button>
-                <button onclick="closeConfirmModal(true)" class="w-1/2 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-semibold text-xs">Eliminar</button>
+            <div class="flex gap-2 text-xs font-bold pt-1">
+                <button onclick="closeConfirmModal(false)" class="w-1/2 bg-slate-850 text-slate-300 py-2 rounded-lg border border-slate-800">Cancelar</button>
+                <button onclick="closeConfirmModal(true)" class="w-1/2 bg-red-600 text-white py-2 rounded-lg">Eliminar</button>
             </div>
         </div>
     </div>
 
-    <!-- ================= CODIGO DE LÓGICA SIN ERRORES (PURA Y RESISTENTE) ================= -->
+    <!-- LÓGICA DE LA APP (A PRUEBA DE FALLOS) -->
     <script>
-        const BUCKET_ID = "ricardo_t_app_2026";
+        const BUCKET = "ricardo_t_rel_2026";
         let syncCode = localStorage.getItem('tanda_sync_code') || "";
         let syncInterval = null;
 
-        // Base de Datos inicial (Cosas de Guns n Roses y Club América de ejemplo)
+        // Base de Datos inicial (Ricardo's style)
         let defaultState = {
             products: [
-                { id: "p1", name: "Guns N' Roses: Appetite for Destruction Box Set", cost: 1200, price: 2500, stock: 3 },
-                { id: "p2", name: "Jersey Club América Edición Especial", cost: 600, price: 1300, stock: 8 },
-                { id: "p3", name: "Perfume Cerrado Imperial Rocker", cost: 400, price: 950, stock: 12 }
+                { id: "p1", name: "Guns N' Roses: Appetite Box Set Deluxe", cost: 1200, price: 2500, stock: 3 },
+                { id: "p2", name: "Jersey Club América Edición Campeón", cost: 600, price: 1300, stock: 5 },
+                { id: "p3", name: "Perfume Cerrado Imperial Rocker", cost: 400, price: 950, stock: 10 }
             ],
             tandas: [
                 {
                     id: "t1",
                     clientName: "Juan Gómez (Ejemplo)",
-                    clientPhone: "555-123-4567",
+                    clientPhone: "555-4433-2211",
                     totalAmount: 3800,
                     numInstallments: 10,
                     frequency: "Semanal",
@@ -380,8 +306,8 @@
                     slotNumber: 1,
                     payments: [true, true, true, false, false, false, false, false, false, false],
                     products: [
-                        { productId: "p1", productName: "Guns N' Roses: Appetite for Destruction Box Set", price: 2500, qty: 1 },
-                        { productId: "p2", productName: "Jersey Club América Edición Especial", price: 1300, qty: 1 }
+                        { productId: "p1", productName: "Guns N' Roses: Appetite Box Set Deluxe", price: 2500, qty: 1 },
+                        { productId: "p2", productName: "Jersey Club América Edición Campeón", price: 1300, qty: 1 }
                     ]
                 }
             ]
@@ -396,317 +322,231 @@
             document.getElementById('tab-tandas').classList.add('hidden');
             document.getElementById('tab-inventario').classList.add('hidden');
 
-            const navIds = ['dashboard', 'tandas', 'inventario'];
-            navIds.forEach(id => {
-                const btn = document.getElementById(`nav-${id}`);
-                btn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-slate-200";
+            ['dashboard', 'tandas', 'inventario'].forEach(id => {
+                document.getElementById(`nav-${id}`).className = "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400";
             });
 
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`nav-${tabId}`);
-            activeBtn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white";
+            document.getElementById(`nav-${tabId}`).className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
 
             renderDashboard();
             renderTandas();
             renderInventario();
         }
 
-        // Guardar Local + Sincronización automática
+        // Guardar Localmente y Subir
         async function saveLocalState() {
             localStorage.setItem('tanda_local_state', JSON.stringify(state));
             await subirCambiosALaNube();
         }
 
-        // --- DASHBOARD ---
+        // --- DASHBOARD RENDER ---
         function renderDashboard() {
-            let totalVendido = 0;
-            let totalCobrado = 0;
-            let totalCostoInvertido = 0;
+            let totalVendido = 0, totalCobrado = 0, totalCosto = 0;
 
             state.tandas.forEach(t => {
                 totalVendido += t.totalAmount;
-                const paymentAmount = t.totalAmount / t.numInstallments;
                 const paidCount = t.payments.filter(p => p).length;
-                totalCobrado += (paymentAmount * paidCount);
+                totalCobrado += (t.totalAmount / t.numInstallments) * paidCount;
 
-                const tProducts = t.products || [];
-                tProducts.forEach(tp => {
+                (t.products || []).forEach(tp => {
                     const orig = state.products.find(p => p.id === tp.productId);
-                    if (orig) {
-                        totalCostoInvertido += orig.cost * (tp.qty || 1);
-                    }
+                    if (orig) totalCosto += orig.cost * (tp.qty || 1);
                 });
             });
 
-            const totalPendiente = totalVendido - totalCobrado;
-            const gananciaEstimada = totalVendido - totalCostoInvertido;
-
             document.getElementById('stat-total-ventas').innerText = formatCurrency(totalVendido);
             document.getElementById('stat-total-cobrado').innerText = formatCurrency(totalCobrado);
-            document.getElementById('stat-total-pendiente').innerText = formatCurrency(totalPendiente);
-            document.getElementById('stat-total-ganancia').innerText = formatCurrency(gananciaEstimada > 0 ? gananciaEstimada : 0);
+            document.getElementById('stat-total-pendiente').innerText = formatCurrency(totalVendido - totalCobrado);
+            document.getElementById('stat-total-ganancia').innerText = formatCurrency(totalVendido - totalCosto > 0 ? totalVendido - totalCosto : 0);
+            document.getElementById('stat-cobrado-porcentaje').innerText = `${totalVendido > 0 ? Math.round((totalCobrado / totalVendido) * 100) : 0}%`;
 
-            const porcentajeCobrado = totalVendido > 0 ? Math.round((totalCobrado / totalVendido) * 100) : 0;
-            document.getElementById('stat-cobrado-porcentaje').innerText = `${porcentajeCobrado}%`;
+            // Abonos recomendados
+            const table = document.getElementById('table-proximos-pagos');
+            table.innerHTML = '';
+            const pendientes = state.tandas.filter(t => t.payments.includes(false));
 
-            // Rellenar abonos sugeridos
-            const proximosTable = document.getElementById('table-proximos-pagos');
-            proximosTable.innerHTML = '';
-
-            const tandasPendientes = state.tandas.filter(t => t.payments.includes(false));
-
-            if (tandasPendientes.length === 0) {
-                proximosTable.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">
-                            🎉 ¡Todo al corriente en las tandas hoy!
-                        </td>
-                    </tr>
-                `;
+            if (pendientes.length === 0) {
+                table.innerHTML = `<tr><td colspan="4" class="px-3 py-6 text-center text-slate-500">Todo cobrado al día 🤘</td></tr>`;
                 return;
             }
 
-            tandasPendientes.forEach(t => {
-                const pendingAmount = t.totalAmount - ( (t.totalAmount / t.numInstallments) * t.payments.filter(p => p).length );
-                const indexUltimoPago = t.payments.indexOf(false);
-                const abonoIndividual = t.totalAmount / t.numInstallments;
-
-                const tProducts = t.products || [{ productName: 'Producto', qty: 1 }];
-                const prodSummary = tProducts.map(tp => `${tp.productName} (x${tp.qty || 1})`).join(', ');
+            pendientes.forEach(t => {
+                const index = t.payments.indexOf(false);
+                const abono = t.totalAmount / t.numInstallments;
+                const restante = t.totalAmount - (abono * t.payments.filter(p => p).length);
+                const prods = (t.products || []).map(tp => `${tp.productName} (x${tp.qty})`).join(', ');
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/40 transition-colors";
+                tr.className = "hover:bg-slate-900/30 transition-colors";
                 tr.innerHTML = `
-                    <td class="px-4 py-3.5">
+                    <td class="px-3 py-3">
                         <div class="font-bold text-slate-200">${t.clientName}</div>
-                        <div class="text-[11px] text-slate-500">${t.clientPhone || 'Sin teléfono'}</div>
                     </td>
-                    <td class="px-4 py-3.5">
-                        <span class="text-indigo-400 font-bold text-xs bg-indigo-500/10 px-2 py-1 rounded">N° ${t.slotNumber || '-'}</span>
-                        <span class="text-xs text-slate-400 ml-1.5 truncate max-w-[150px] inline-block align-middle">${prodSummary}</span>
+                    <td class="px-3 py-3">
+                        <div class="text-[10px] text-slate-400 truncate max-w-[120px]">${prods}</div>
                     </td>
-                    <td class="px-4 py-3.5 font-bold text-emerald-400">
-                        ${formatCurrency(abonoIndividual)}
-                    </td>
-                    <td class="px-4 py-3.5 text-slate-400 font-semibold">
-                        ${formatCurrency(pendingAmount)}
-                    </td>
-                    <td class="px-4 py-3.5 text-right">
-                        <button onclick="abonaTandaRapido('${t.id}', ${indexUltimoPago})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow">
-                            Cobrar
-                        </button>
+                    <td class="px-3 py-3 font-bold text-emerald-400">${formatCurrency(abono)}</td>
+                    <td class="px-3 py-3 text-slate-400">${formatCurrency(restante)}</td>
+                    <td class="px-3 py-3 text-right">
+                        <button onclick="abonaTandaRapido('${t.id}', ${index})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2 py-1 rounded text-[10px]">Cobrar</button>
                     </td>
                 `;
-                proximosTable.appendChild(tr);
+                table.appendChild(tr);
             });
         }
 
-        // --- RENDER DE TANDAS COMPLETO ---
+        // --- TANDAS RENDER ---
         function renderTandas() {
             const container = document.getElementById('tandas-container');
             container.innerHTML = '';
 
             if (state.tandas.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800 border-dashed text-slate-500">
-                        No hay ninguna tanda registrada. Haz clic en "Nueva Tanda".
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">No hay ninguna tanda activa.</div>`;
                 return;
             }
 
             state.tandas.forEach(t => {
                 const totalPagados = t.payments.filter(p => p).length;
-                const abonoValor = t.totalAmount / t.numInstallments;
-                const montoCobrado = abonoValor * totalPagados;
-                const porcentaje = Math.round((montoCobrado / t.totalAmount) * 100);
+                const abono = t.totalAmount / t.numInstallments;
+                const cobrado = abono * totalPagados;
+                const resta = t.totalAmount - cobrado;
+                const porcentaje = Math.round((cobrado / t.totalAmount) * 100);
 
-                let paymentsGridHTML = '';
+                let gridHTML = '';
                 t.payments.forEach((p, idx) => {
-                    const statusClass = p 
-                        ? 'bg-emerald-500 border-emerald-400 text-slate-950 font-bold shadow' 
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-indigo-500';
-                    paymentsGridHTML += `
+                    gridHTML += `
                         <button onclick="togglePaymentState('${t.id}', ${idx})" 
-                            title="Abono ${idx + 1}: ${formatCurrency(abonoValor)}"
-                            class="w-10 h-10 rounded-xl border text-xs flex items-center justify-center font-bold transition-all ${statusClass}">
+                            class="w-8 h-8 rounded-lg border text-[11px] font-bold transition-all ${p ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-indigo-500'}">
                             ${idx + 1}
                         </button>
                     `;
                 });
 
-                const tProducts = t.products || [{ productId: t.productId, productName: t.productName || 'Producto', price: t.totalAmount, qty: 1 }];
-                let productsHTML = '';
-                tProducts.forEach(tp => {
-                    productsHTML += `
-                        <div class="flex justify-between text-xs text-slate-300 py-1 border-b border-slate-800/30 last:border-0">
-                            <span class="truncate max-w-[180px]">🎸 ${tp.productName}</span>
-                            <span class="font-semibold text-slate-400">x${tp.qty || 1}</span>
+                let prodsHTML = '';
+                (t.products || []).forEach(tp => {
+                    prodsHTML += `
+                        <div class="flex justify-between text-[11px] text-slate-300 py-0.5">
+                            <span class="truncate max-w-[160px]">🎸 ${tp.productName}</span>
+                            <span class="font-bold text-slate-500">x${tp.qty}</span>
                         </div>
                     `;
                 });
 
                 const card = document.createElement('div');
-                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-750 transition-all shadow-xl relative overflow-hidden";
+                card.className = "bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3.5";
                 card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-bold text-lg text-slate-100 flex items-center gap-1.5">
-                                    ${t.clientName}
-                                    ${t.slotNumber ? `<span class="bg-indigo-600/20 text-indigo-400 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">N° ${t.slotNumber}</span>` : ''}
-                                </h3>
-                                <p class="text-xs text-slate-400">${t.clientPhone || 'Sin teléfono'}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="editTanda('${t.id}')" class="p-1 text-slate-400 hover:text-slate-100 transition-colors">
-                                    📝
-                                </button>
-                                <button onclick="triggerDeleteTanda('${t.id}')" class="p-1 text-slate-400 hover:text-red-500 transition-colors">
-                                    ✕
-                                </button>
-                            </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-100 flex items-center gap-1.5">
+                                ${t.clientName}
+                                ${t.slotNumber ? `<span class="bg-indigo-600/30 text-indigo-400 text-[9px] px-1.5 py-0.5 rounded-md font-bold">N° ${t.slotNumber}</span>` : ''}
+                            </h3>
+                            <p class="text-[10px] text-slate-500">${t.clientPhone || 'Sin teléfono'}</p>
                         </div>
-
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-850 mb-3 space-y-1.5">
-                            <span class="text-[9px] text-indigo-400 uppercase font-bold tracking-wider">Productos de la Tanda</span>
-                            ${productsHTML}
-                            <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-800 text-xs text-slate-400">
-                                <span>Pagos: <strong>${t.frequency}</strong></span>
-                                <span>Total: <strong class="text-emerald-400 font-bold">${formatCurrency(t.totalAmount)}</strong></span>
-                            </div>
-                        </div>
-
-                        <!-- Cuentas claras solicitadas -->
-                        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-900/80 mb-4 space-y-1">
-                            <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-400">Progreso:</span>
-                                <span class="text-indigo-400 font-bold">${porcentaje}% (${totalPagados}/${t.payments.length})</span>
-                            </div>
-                            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/60">
-                                <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full transition-all" style="width: ${porcentaje}%"></div>
-                            </div>
-                            <div class="flex justify-between text-xs pt-1.5">
-                                <span class="text-slate-400 font-medium">Lleva pagado: <strong class="text-emerald-400 font-bold">${formatCurrency(montoCobrado)}</strong></span>
-                                <span class="text-slate-400 font-medium">Resta: <strong class="text-amber-500 font-bold">${formatCurrency(t.totalAmount - montoCobrado)}</strong></span>
-                            </div>
+                        <div class="flex gap-1.5 text-xs">
+                            <button onclick="editTanda('${t.id}')">📝</button>
+                            <button onclick="triggerDeleteTanda('${t.id}')">✕</button>
                         </div>
                     </div>
 
-                    <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-2">Cuadrícula de Abonos</span>
-                        <div class="flex flex-wrap gap-2">
-                            ${paymentsGridHTML}
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-850">
+                        <span class="text-[8px] text-indigo-400 uppercase font-bold tracking-wider block mb-1">Mercancía</span>
+                        ${prodsHTML}
+                        <div class="flex justify-between items-center mt-1.5 pt-1.5 border-t border-slate-800 text-[11px] text-slate-400">
+                            <span>Pagos: <strong>${t.frequency}</strong></span>
+                            <span>Total: <strong class="text-emerald-400 font-bold">${formatCurrency(t.totalAmount)}</strong></span>
                         </div>
+                    </div>
+
+                    <!-- Métricas de cuenta clara solicitadas -->
+                    <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-900 space-y-1 text-[11px]">
+                        <div class="flex justify-between font-bold">
+                            <span class="text-slate-400">Progreso</span>
+                            <span class="text-indigo-400">${porcentaje}% (${totalPagados}/${t.payments.length})</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+                            <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full" style="width: ${porcentaje}%"></div>
+                        </div>
+                        <div class="flex justify-between pt-1 font-medium">
+                            <span class="text-slate-400">Lleva: <strong class="text-emerald-400 font-bold">${formatCurrency(cobrado)}</strong></span>
+                            <span class="text-slate-400">Resta: <strong class="text-amber-500 font-bold">${formatCurrency(resta)}</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-1.5">
+                        ${gridHTML}
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // --- CATALOGO ---
+        // --- CATALOGO RENDER ---
         function renderInventario() {
-            const tableBody = document.getElementById('table-productos');
-            tableBody.innerHTML = '';
+            const table = document.getElementById('table-productos');
+            table.innerHTML = '';
 
             state.products.forEach(p => {
-                const ganancia = p.price - p.cost;
-                const margen = p.price > 0 ? Math.round((ganancia / p.price) * 100) : 0;
-
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/40 transition-colors";
+                tr.className = "hover:bg-slate-900/30";
                 tr.innerHTML = `
-                    <td class="px-6 py-4 font-bold text-slate-200">
-                        ${p.name}
-                    </td>
-                    <td class="px-6 py-4 text-slate-400">
-                        ${formatCurrency(p.cost)}
-                    </td>
-                    <td class="px-6 py-4 text-emerald-400 font-bold">
-                        ${formatCurrency(p.price)}
-                    </td>
-                    <td class="px-6 py-4 text-violet-400 font-semibold">
-                        <div>${formatCurrency(ganancia)}</div>
-                        <div class="text-[10px] text-slate-500">Margen: ${margen}%</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${p.stock > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
-                            ${p.stock} piezas
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex gap-2 justify-end text-lg">
-                            <button onclick="editProduct('${p.id}')" class="p-1 text-slate-400 hover:text-slate-100">
-                                📝
-                            </button>
-                            <button onclick="triggerDeleteProduct('${p.id}')" class="p-1 text-slate-400 hover:text-red-500">
-                                ✕
-                            </button>
-                        </div>
+                    <td class="px-4 py-3 font-bold text-slate-200">${p.name}</td>
+                    <td class="px-4 py-3 text-slate-400">${formatCurrency(p.cost)}</td>
+                    <td class="px-4 py-3 text-emerald-400 font-bold">${formatCurrency(p.price)}</td>
+                    <td class="px-4 py-3">${p.stock} pzas</td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="editProduct('${p.id}')" class="px-1">📝</button>
+                        <button onclick="triggerDeleteProduct('${p.id}')" class="px-1 text-red-400">✕</button>
                     </td>
                 `;
-                tableBody.appendChild(tr);
+                table.appendChild(tr);
             });
         }
 
-        // --- PRODUCTOS MÚLTIPLES EN EL MODAL ---
-        function addProductRowToModal(productId = '', qty = 1) {
+        // --- MANEJO DE PRODUCTOS EN MODAL ---
+        window.addProductRow = function(productId = '', qty = 1) {
             const container = document.getElementById('tanda-products-list');
-            const rowId = 'prow_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            const rowId = 'prow_' + Date.now() + '_' + Math.floor(Math.random() * 100);
 
             const row = document.createElement('div');
             row.id = rowId;
-            row.className = "flex gap-2 items-center bg-slate-950 p-2 rounded-xl border border-slate-850";
+            row.className = "flex gap-2 items-center bg-slate-950 p-1.5 rounded-lg border border-slate-850";
 
-            let optionsHTML = '';
+            let options = '';
             state.products.forEach(p => {
-                optionsHTML += `<option value="${p.id}" ${p.id === productId ? 'selected' : ''}>${p.name} (${formatCurrency(p.price)})</option>`;
+                options += `<option value="${p.id}" ${p.id === productId ? 'selected' : ''}>${p.name} (${formatCurrency(p.price)})</option>`;
             });
 
             row.innerHTML = `
-                <select class="prow-select flex-1 bg-transparent text-xs text-slate-100 outline-none" onchange="recalculateTandaTotal()">
-                    ${optionsHTML}
+                <select class="prow-select flex-1 bg-transparent text-[11px] outline-none" onchange="recalculateTandaTotal()">
+                    ${options}
                 </select>
-                <div class="flex items-center gap-1">
-                    <span class="text-[10px] text-slate-500">Cant:</span>
-                    <input type="number" class="prow-qty w-10 bg-slate-900 border border-slate-800 rounded text-center text-xs text-slate-100 py-1" min="1" max="10" value="${qty}" onchange="recalculateTandaTotal()">
-                </div>
-                <button type="button" onclick="removeProductRow('${rowId}')" class="text-red-400 hover:text-red-300 text-xs px-1">
-                    ✕
-                </button>
+                <input type="number" class="prow-qty w-8 bg-slate-900 rounded text-center text-[11px]" min="1" value="${qty}" onchange="recalculateTandaTotal()">
+                <button type="button" onclick="removeProductRow('${rowId}')" class="text-red-400 px-1 font-bold">✕</button>
             `;
             container.appendChild(row);
             recalculateTandaTotal();
-        }
+        };
 
-        function removeProductRow(rowId) {
+        window.removeProductRow = function(rowId) {
             const row = document.getElementById(rowId);
-            if (row) {
-                row.remove();
-                recalculateTandaTotal();
-            }
-        }
+            if (row) { row.remove(); recalculateTandaTotal(); }
+        };
 
-        function recalculateTandaTotal() {
-            const rows = document.querySelectorAll('#tanda-products-list > div');
+        window.recalculateTandaTotal = function() {
             let total = 0;
-            rows.forEach(row => {
-                const select = row.querySelector('.prow-select');
-                const qtyInput = row.querySelector('.prow-qty');
-                if (select && qtyInput) {
-                    const prodId = select.value;
-                    const qty = parseInt(qtyInput.value) || 1;
-                    const prod = state.products.find(p => p.id === prodId);
-                    if (prod) {
-                        total += prod.price * qty;
-                    }
-                }
+            document.querySelectorAll('#tanda-products-list > div').forEach(row => {
+                const id = row.querySelector('.prow-select').value;
+                const qty = parseInt(row.querySelector('.prow-qty').value) || 1;
+                const prod = state.products.find(p => p.id === id);
+                if (prod) total += prod.price * qty;
             });
             document.getElementById('tanda-amount').value = total;
-        }
+        };
 
         // --- OPERACIONES: TANDAS ---
-        function openTandaModal() {
+        window.openTandaModal = function() {
             document.getElementById('tanda-modal-title').innerText = "Registrar Nueva Tanda";
             document.getElementById('tanda-id').value = '';
             document.getElementById('tanda-client').value = '';
@@ -717,111 +557,75 @@
             document.getElementById('tanda-date').value = new Date().toISOString().split('T')[0];
             
             document.getElementById('tanda-products-list').innerHTML = '';
-            if (state.products.length > 0) {
-                addProductRowToModal(state.products[0].id, 1);
-            }
+            if (state.products.length > 0) addProductRow(state.products[0].id, 1);
 
             document.getElementById('modal-tanda').classList.remove('hidden');
-        }
+        };
 
-        function closeTandaModal() {
-            document.getElementById('modal-tanda').classList.add('hidden');
-        }
+        window.closeTandaModal = function() { document.getElementById('modal-tanda').classList.add('hidden'); };
 
-        async function saveTanda(event) {
+        window.saveTanda = async function(event) {
             event.preventDefault();
             const id = document.getElementById('tanda-id').value;
             const client = document.getElementById('tanda-client').value;
             const phone = document.getElementById('tanda-phone').value;
-            const slotNumber = parseInt(document.getElementById('tanda-number').value) || null;
+            const number = parseInt(document.getElementById('tanda-number').value) || null;
             const installments = parseInt(document.getElementById('tanda-installments').value);
-            const frequency = document.getElementById('tanda-frequency').value;
+            const freq = document.getElementById('tanda-frequency').value;
             const date = document.getElementById('tanda-date').value;
 
-            const rows = document.querySelectorAll('#tanda-products-list > div');
-            const selectedProducts = [];
-            let totalTandaSum = 0;
+            const selected = [];
+            let sum = 0;
 
-            rows.forEach(row => {
-                const select = row.querySelector('.prow-select');
-                const qtyInput = row.querySelector('.prow-qty');
-                if (select && qtyInput) {
-                    const prodId = select.value;
-                    const qty = parseInt(qtyInput.value) || 1;
-                    const prod = state.products.find(p => p.id === prodId);
-                    if (prod) {
-                        selectedProducts.push({
-                            productId: prod.id,
-                            productName: prod.name,
-                            price: prod.price,
-                            qty: qty
-                        });
-                        totalTandaSum += prod.price * qty;
-
-                        if (!id && prod.stock >= qty) {
-                            prod.stock -= qty;
-                        }
-                    }
+            document.querySelectorAll('#tanda-products-list > div').forEach(row => {
+                const pId = row.querySelector('.prow-select').value;
+                const qty = parseInt(row.querySelector('.prow-qty').value) || 1;
+                const prod = state.products.find(p => p.id === pId);
+                if (prod) {
+                    selected.push({ productId: pId, productName: prod.name, price: prod.price, qty });
+                    sum += prod.price * qty;
+                    if (!id && prod.stock >= qty) prod.stock -= qty;
                 }
             });
 
-            if (selectedProducts.length === 0) {
-                showToast("Agrega al menos un producto", "error");
-                return;
-            }
+            if (selected.length === 0) { showToast("Selecciona un producto", "error"); return; }
 
             if (id) {
-                const tIdx = state.tandas.findIndex(t => t.id === id);
-                if (tIdx > -1) {
-                    const originalPayments = state.tandas[tIdx].payments;
-                    let newPayments = [...originalPayments];
-
-                    if (installments !== originalPayments.length) {
-                        if (installments > originalPayments.length) {
-                            newPayments = [...originalPayments, ...Array(installments - originalPayments.length).fill(false)];
-                        } else {
-                            newPayments = originalPayments.slice(0, installments);
-                        }
+                const idx = state.tandas.findIndex(t => t.id === id);
+                if (idx > -1) {
+                    const orig = state.tandas[idx].payments;
+                    let newPayments = [...orig];
+                    if (installments > orig.length) {
+                        newPayments = [...orig, ...Array(installments - orig.length).fill(false)];
+                    } else if (installments < orig.length) {
+                        newPayments = orig.slice(0, installments);
                     }
 
-                    state.tandas[tIdx] = {
-                        ...state.tandas[tIdx],
-                        clientName: client,
-                        clientPhone: phone,
-                        totalAmount: totalTandaSum,
-                        numInstallments: installments,
-                        frequency,
-                        startDate: date,
-                        slotNumber,
-                        payments: newPayments,
-                        products: selectedProducts
+                    state.tandas[idx] = {
+                        ...state.tandas[idx],
+                        clientName: client, clientPhone: phone, totalAmount: sum,
+                        numInstallments: installments, frequency: freq, startDate: date,
+                        slotNumber: number, payments: newPayments, products: selected
                     };
-                    showToast("Tanda editada con éxito");
+                    showToast("Tanda guardada");
                 }
             } else {
-                const nueva = {
-                    id: 't_' + Date.now(),
-                    clientName: client,
-                    clientPhone: phone,
-                    totalAmount: totalTandaSum,
-                    numInstallments: installments,
-                    frequency,
-                    startDate: date,
-                    slotNumber,
-                    payments: Array(installments).fill(false),
-                    products: selectedProducts
-                };
-                state.tandas.push(nueva);
-                showToast("¡Tanda guardada correctamente!");
+                state.tandas.push({
+                    id: 't_' + Date.now(), clientName: client, clientPhone: phone,
+                    totalAmount: sum, numInstallments: installments, frequency: freq,
+                    startDate: date, slotNumber: number, payments: Array(installments).fill(false),
+                    products: selected
+                });
+                showToast("Tanda creada");
             }
 
             await saveLocalState();
             closeTandaModal();
             renderDashboard();
             renderTandas();
-        }
+        };
 
-        function editTanda(id) {
+        window.editTanda = function(id) {
             const t = state.tandas.find(t => t.id === id);
             if (!t) return;
 
@@ -837,16 +641,15 @@
             const container = document.getElementById('tanda-products-list');
             container.innerHTML = '';
             
-            const tProducts = t.products || [{ productId: t.productId, productName: t.productName, price: t.totalAmount, qty: 1 }];
-            tProducts.forEach(tp => {
-                addProductRowToModal(tp.productId, tp.qty || 1);
+            (t.products || [{ productId: t.productId, price: t.totalAmount, qty: 1 }]).forEach(tp => {
+                addProductRow(tp.productId, tp.qty || 1);
             });
 
             document.getElementById('tanda-amount').value = t.totalAmount;
             document.getElementById('modal-tanda').classList.remove('hidden');
-        }
+        };
 
-        async function togglePaymentState(tandaId, index) {
+        window.togglePaymentState = async function(tandaId, index) {
             const t = state.tandas.find(t => t.id === tandaId);
             if (t) {
                 t.payments[index] = !t.payments[index];
@@ -855,35 +658,32 @@
                 renderTandas();
                 showToast("Abono actualizado");
             }
-        }
+        };
 
-        async function abonaTandaRapido(tandaId, index) {
+        window.abonaTandaRapido = async function(tandaId, index) {
             const t = state.tandas.find(t => t.id === tandaId);
             if (t) {
                 t.payments[index] = true;
                 await saveLocalState();
                 renderDashboard();
                 renderTandas();
-                showToast("¡Abono registrado!");
+                showToast("¡Cobro registrado!");
             }
-        }
+        };
 
-        // --- CATALOGO ---
-        function openProductModal() {
-            document.getElementById('product-modal-title').innerText = "Registrar Producto";
+        // --- OPERACIONES: CATÁLOGO ---
+        window.openProductModal = function() {
             document.getElementById('product-id').value = '';
             document.getElementById('product-name').value = '';
             document.getElementById('product-cost').value = '';
             document.getElementById('product-price').value = '';
             document.getElementById('product-stock').value = '1';
             document.getElementById('modal-product').classList.remove('hidden');
-        }
+        };
 
-        function closeProductModal() {
-            document.getElementById('modal-product').classList.add('hidden');
-        }
+        window.closeProductModal = function() { document.getElementById('modal-product').classList.add('hidden'); };
 
-        async function saveProduct(event) {
+        window.saveProduct = async function(event) {
             event.preventDefault();
             const id = document.getElementById('product-id').value;
             const name = document.getElementById('product-name').value;
@@ -893,104 +693,95 @@
 
             if (id) {
                 const idx = state.products.findIndex(p => p.id === id);
-                if (idx > -1) {
-                    state.products[idx] = { id, name, cost, price, stock };
-                    showToast("Producto modificado");
-                }
+                if (idx > -1) state.products[idx] = { id, name, cost, price, stock };
             } else {
-                const nuevo = {
-                    id: 'p_' + Date.now(),
-                    name, cost, price, stock
-                };
-                state.products.push(nuevo);
-                showToast("Producto añadido");
+                state.products.push({ id: 'p_' + Date.now(), name, cost, price, stock });
             }
 
             await saveLocalState();
             closeProductModal();
             renderInventario();
             renderDashboard();
-        }
+            showToast("Catálogo actualizado");
+        };
 
-        function editProduct(id) {
+        window.editProduct = function(id) {
             const p = state.products.find(p => p.id === id);
             if (!p) return;
-
-            document.getElementById('product-modal-title').innerText = "Editar Producto";
             document.getElementById('product-id').value = p.id;
             document.getElementById('product-name').value = p.name;
             document.getElementById('product-cost').value = p.cost;
             document.getElementById('product-price').value = p.price;
             document.getElementById('product-stock').value = p.stock;
             document.getElementById('modal-product').classList.remove('hidden');
-        }
+        };
 
-        // --- DIÁLOGOS ---
+        // --- DIALOGOS ---
         function triggerConfirm(text, onAccept) {
             document.getElementById('confirm-modal-text').innerText = text;
             document.getElementById('modal-confirm').classList.remove('hidden');
             onConfirmAction = onAccept;
         }
 
-        function closeConfirmModal(accepted) {
+        window.closeConfirmModal = function(accepted) {
             document.getElementById('modal-confirm').classList.add('hidden');
-            if (accepted && onConfirmAction) {
-                onConfirmAction();
-            }
+            if (accepted && onConfirmAction) onConfirmAction();
             onConfirmAction = null;
-        }
+        };
 
-        function triggerDeleteTanda(id) {
-            triggerConfirm("¿Eliminar por completo esta tanda de la nube?", async () => {
+        window.triggerDeleteTanda = function(id) {
+            triggerConfirm("¿Eliminar la tanda completa de este cliente?", async () => {
                 state.tandas = state.tandas.filter(t => t.id !== id);
                 await saveLocalState();
                 renderDashboard();
                 renderTandas();
                 showToast("Tanda borrada", "error");
             });
-        }
+        };
 
-        function triggerDeleteProduct(id) {
-            const enUso = state.tandas.some(t => {
-                const tProducts = t.products || [];
-                return tProducts.some(tp => tp.productId === id);
-            });
-            if (enUso) {
-                showToast("No se puede borrar, el producto está asignado a una tanda", "error");
-                return;
-            }
-            triggerConfirm("¿Eliminar este producto del catálogo?", async () => {
+        window.triggerDeleteProduct = function(id) {
+            const enUso = state.tandas.some(t => (t.products || []).some(tp => tp.productId === id));
+            if (enUso) { showToast("Producto asignado a tanda activa", "error"); return; }
+            triggerConfirm("¿Borrar este producto de tu catálogo?", async () => {
                 state.products = state.products.filter(p => p.id !== id);
                 await saveLocalState();
                 renderInventario();
                 showToast("Producto eliminado", "error");
             });
+        };
+
+        // --- SISTEMA DE ENLACE INTELIGENTE Y SINCRONIZACIÓN SEGUNDA GENERACIÓN (REDMI Y GALAXY) ---
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // --- SISTEMA DE SINCRONIZACIÓN AUTOMÁTICA ULTRA-RESISTENTE ---
         function openSyncModal() {
             document.getElementById('sync-code-input').value = syncCode;
             actualizarUIModalSync();
             document.getElementById('modal-sync').classList.remove('hidden');
         }
 
-        function closeSyncModal() {
-            document.getElementById('modal-sync').classList.add('hidden');
-        }
+        function closeSyncModal() { document.getElementById('modal-sync').classList.add('hidden'); }
 
         function actualizarUIModalSync() {
-            const modalDot = document.getElementById('modal-sync-dot');
-            const modalText = document.getElementById('modal-sync-status-text');
+            const dot = document.getElementById('modal-sync-dot');
+            const txt = document.getElementById('modal-sync-status-text');
             const btnDesc = document.getElementById('btn-desconectar');
+            const btnWA = document.getElementById('btn-whatsapp');
 
             if (syncCode) {
-                modalDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                modalText.innerText = `Sincronizado con el código: ${syncCode}`;
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                txt.innerText = `Enlazado: ${syncCode}`;
                 btnDesc.classList.remove('hidden');
+                btnWA.classList.remove('hidden');
             } else {
-                modalDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-                modalText.innerText = "Guardando de manera local (Celulares desconectados)";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+                txt.innerText = "Guardando solo localmente (Celulares desconectados)";
                 btnDesc.classList.add('hidden');
+                btnWA.classList.add('hidden');
             }
         }
 
@@ -1003,35 +794,36 @@
             if (syncCode) {
                 dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
                 text.innerText = `Nube Activa: ${syncCode}`;
-                badge.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer";
+                badge.className = "inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-bold cursor-pointer";
                 btnSync.classList.remove('hidden');
             } else {
                 dot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
                 text.innerText = "Solo Local (Toca para conectar)";
-                badge.className = "inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer";
+                badge.className = "inline-flex items-center gap-1 text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-bold cursor-pointer";
                 btnSync.classList.add('hidden');
             }
         }
 
-        async function conectarNube() {
+        window.conectarNube = async function() {
             const inputVal = document.getElementById('sync-code-input').value.trim();
-            if (!inputVal) {
-                showToast("Por favor escribe un código", "error");
-                return;
-            }
+            if (!inputVal) { showToast("Escribe un código familiar", "error"); return; }
 
             syncCode = inputVal;
             localStorage.setItem('tanda_sync_code', syncCode);
-            showToast("Buscando datos familiares...");
+            showToast("Buscando datos compartidos...");
 
             const datosNube = await bajarDatosDeLaNube(syncCode);
-            if (datosNube) {
+
+            // ESCUDO DE PROTECCIÓN DE DATOS:
+            // Si la nube está vacía pero mi celular ya tiene información valiosa, subirla de inmediato
+            if (!datosNube || (datosNube.tandas.length === 0 && state.tandas.length > 0)) {
+                await subirCambiosALaNube();
+                showToast("Datos locales subidos a la nube con éxito");
+            } else if (datosNube) {
+                // Si la nube tiene más tandas, adoptamos la nube
                 state = datosNube;
                 localStorage.setItem('tanda_local_state', JSON.stringify(state));
-                showToast("¡Celulares enlazados con éxito!");
-            } else {
-                await subirCambiosALaNube();
-                showToast("Código familiar creado en la nube");
+                showToast("¡Celulares sincronizados correctamente!");
             }
 
             actualizarUIModalSync();
@@ -1041,15 +833,13 @@
             renderDashboard();
             renderTandas();
             renderInventario();
-
             iniciarAutoSync();
-        }
+        };
 
-        function desconectarNube() {
+        window.desconectarNube = function() {
             syncCode = "";
             localStorage.removeItem('tanda_sync_code');
             if (syncInterval) clearInterval(syncInterval);
-
             showToast("Sincronización apagada", "error");
             actualizarUIModalSync();
             actualizarBadgeSync();
@@ -1057,13 +847,20 @@
             renderDashboard();
             renderTandas();
             renderInventario();
-        }
+        };
 
-        async function forzarSincronizacionManual() {
+        window.compartirPorWhatsApp = function() {
+            const urlBase = window.location.origin + window.location.pathname;
+            const enlaceCompleto = `${urlBase}?sync=${encodeURIComponent(syncCode)}`;
+            const mensaje = encodeURIComponent(`Hola mi amor, abre este enlace para conectarte automáticamente a nuestro control de tandas compartido: ${enlaceCompleto}`);
+            window.open(`https://api.whatsapp.com/send?text=${mensaje}`);
+        };
+
+        window.forzarSincronizacionManual = async function() {
             if (!syncCode) return;
             const btn = document.getElementById('btn-sync-now');
-            btn.innerText = "🔄 Sincronizando...";
-            
+            btn.innerText = "🔄 Cargando...";
+
             const datos = await bajarDatosDeLaNube(syncCode);
             if (datos) {
                 state = datos;
@@ -1071,17 +868,16 @@
                 renderDashboard();
                 renderTandas();
                 renderInventario();
-                showToast("¡Actualizado!");
-            } else {
-                showToast("Todo al día", "info");
+                showToast("Sincronizado");
             }
             btn.innerText = "🔄 Sincronizar ya";
-        }
+        };
 
         async function subirCambiosALaNube() {
             if (!syncCode) return;
             try {
-                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/${BUCKET_ID}_${syncCode}`;
+                const hash = await sha256(syncCode);
+                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/tanda_${hash}`;
                 await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1092,11 +888,11 @@
             }
         }
 
-        // Se agregó cache buster y headers estrictos para Android (Chrome)
         async function bajarDatosDeLaNube(code) {
             try {
-                const cacheBuster = Date.now();
-                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/${BUCKET_ID}_${code}?t=${cacheBuster}`;
+                const hash = await sha256(code);
+                // Cache buster extremo para evitar que el Redmi y el Galaxy guarden historial viejo
+                const url = `https://kvdb.io/A9z8G8yY9u5b3c2d1e0f/tanda_${hash}?cb=${Date.now()}`;
                 const res = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -1105,11 +901,9 @@
                         'Expires': '0'
                     }
                 });
-                if (res.status === 200) {
-                    return await res.json();
-                }
+                if (res.status === 200) return await res.json();
             } catch (e) {
-                console.error("Error al bajar:", e);
+                console.error("Error al descargar:", e);
             }
             return null;
         }
@@ -1118,7 +912,7 @@
             if (syncInterval) clearInterval(syncInterval);
             if (!syncCode) return;
 
-            // Busca cambios nuevos en segundo plano cada 12 segundos
+            // Revisar cambios silenciosamente cada 10 segundos
             syncInterval = setInterval(async () => {
                 const datos = await bajarDatosDeLaNube(syncCode);
                 if (datos) {
@@ -1128,47 +922,45 @@
                         renderDashboard();
                         renderTandas();
                         renderInventario();
-                        showToast("¡Sincronizado con cambios nuevos!");
+                        showToast("Nube actualizada");
                     }
                 }
-            }, 12000);
+            }, 10000);
         }
 
-        // --- AUXILIARES ---
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: 'MXN'
-            }).format(value);
+        function formatCurrency(v) {
+            return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
         }
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
+        // --- CARGA INICIAL Y ENLACE AUTOMÁTICO ---
+        window.onload = async function() {
+            // Leer enlace mágico si viene desde WhatsApp (?sync=codigo)
+            const params = new URLSearchParams(window.location.search);
+            const syncParam = params.get('sync');
             
-            const bgColor = type === 'success' ? 'bg-indigo-600' : 'bg-red-600';
-            const icon = type === 'success' 
-                ? `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
-                : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+            if (syncParam) {
+                syncCode = decodeURIComponent(syncParam);
+                localStorage.setItem('tanda_sync_code', syncCode);
+                // Limpiar la barra del navegador para estética
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showToast("¡Enlace mágico cargado!");
+            }
 
-            toast.className = `flex items-center gap-3 ${bgColor} text-white text-xs font-bold py-3.5 px-5 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-2 opacity-0`;
-            toast.innerHTML = `${icon}<span>${message}</span>`;
-
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => { toast.remove(); }, 300);
-            }, 3500);
-        }
-
-        window.onload = function() {
             actualizarBadgeSync();
             renderDashboard();
             renderTandas();
             renderInventario();
 
             if (syncCode) {
+                // Al entrar, cargar datos de forma segura
+                const datos = await bajarDatosDeLaNube(syncCode);
+                if (datos) {
+                    state = datos;
+                    localStorage.setItem('tanda_local_state', JSON.stringify(state));
+                    renderDashboard();
+                    renderTandas();
+                    renderInventario();
+                }
                 iniciarAutoSync();
             }
         };
